@@ -58,22 +58,22 @@ export type ImpactStat = {
  */
 export const impactStats: readonly ImpactStat[] = [
   {
-    value: societies.length,
+    value: 3,
     suffix: "",
-    label: "Chartered societies",
-    note: "Operating under this branch",
+    label: "Technical Chapters",
+    note: "IAS, CS, and RAS",
+  },
+  {
+    value: 1,
+    suffix: "",
+    label: "Affinity Group",
+    note: "Women in Engineering (WIE)",
   },
   {
     value: new Set(societies.flatMap((s) => s.areas)).size,
     suffix: "",
     label: "Technical areas",
-    note: "Across all five charter scopes",
-  },
-  {
-    value: 1,
-    suffix: "",
-    label: "University",
-    note: `${site.city}, ${site.country}`,
+    note: "Under the IEEE Student Branch",
   },
   {
     value: awaitingFacts.length,

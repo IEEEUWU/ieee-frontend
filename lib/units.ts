@@ -39,6 +39,8 @@ export type SocietyColour = {
   readonly ink: string;
 };
 
+export type UnitType = "branch" | "chapter" | "affinity_group";
+
 export type Society = {
   id: SocietyId;
   /** Charter abbreviation. Rendered in tabular figures as an index reference. */
@@ -51,6 +53,16 @@ export type Society = {
   /** Fields the branch has not supplied yet. Never filled in by guesswork. */
   pending: readonly string[];
   colour: SocietyColour;
+  /** Organizational hierarchy type */
+  unitType: UnitType;
+  /** Human-readable category label */
+  unitTypeLabel: string;
+  /** Parent unit id, null for the apex student branch */
+  parentId: SocietyId | null;
+  /** Subdomain or dedicated sub-page URL for this unit (can be external or internal route) */
+  portalUrl: string | null;
+  /** Display label for the portal action */
+  portalLabel: string;
 };
 
 export const societies: readonly Society[] = [
@@ -58,9 +70,14 @@ export const societies: readonly Society[] = [
     id: "sb",
     abbreviation: "SB",
     name: "IEEE Student Branch",
+    unitType: "branch",
+    unitTypeLabel: "Apex Student Branch",
+    parentId: null,
+    portalUrl: "/",
+    portalLabel: "Branch Portal",
     scope:
-      "The umbrella society. It runs the branch calendar and the public technical events that every other society builds on.",
-    areas: ["Events and hackathons", "Technical workshops", "Branch governance"],
+      "The umbrella parent organization. It oversees branch governance, sets the overarching calendar, and anchors the public technical events that all chapters and affinity groups build upon.",
+    areas: ["Branch governance", "Public events & hackathons", "Inter-chapter initiatives"],
     pending: ["Branch officer roster", "Annual activity report"],
     colour: { brand: "#00629B", ink: "#00629B" },
   },
@@ -68,6 +85,11 @@ export const societies: readonly Society[] = [
     id: "ias",
     abbreviation: "IAS",
     name: "Industrial Automation Society",
+    unitType: "chapter",
+    unitTypeLabel: "Technical Chapter",
+    parentId: "sb",
+    portalUrl: "/chapters/ias",
+    portalLabel: "IAS Chapter Portal",
     scope:
       "Process control, instrumentation and factory automation. Members work on control loops, plant logic and the measurement systems that run real equipment.",
     areas: [
@@ -82,6 +104,11 @@ export const societies: readonly Society[] = [
     id: "cs",
     abbreviation: "CS",
     name: "Computer Society",
+    unitType: "chapter",
+    unitTypeLabel: "Technical Chapter",
+    parentId: "sb",
+    portalUrl: "/chapters/cs",
+    portalLabel: "Computer Society Portal",
     scope:
       "Computing practice end to end: languages, systems, networks, data and security. Members build software, run infrastructure and test systems on purpose.",
     areas: ["Software and systems", "Networks and security", "Data and machine learning"],
@@ -92,6 +119,11 @@ export const societies: readonly Society[] = [
     id: "ras",
     abbreviation: "RAS",
     name: "Robotics and Automation Society",
+    unitType: "chapter",
+    unitTypeLabel: "Technical Chapter",
+    parentId: "sb",
+    portalUrl: "/chapters/ras",
+    portalLabel: "RAS Chapter Portal",
     scope:
       "Robotics, mechatronics and control. Members build machines that sense and act, from embedded controllers through to autonomous platforms.",
     areas: ["Embedded systems", "Robot design and control", "Autonomous platforms"],
@@ -102,13 +134,27 @@ export const societies: readonly Society[] = [
     id: "wie",
     abbreviation: "WIE",
     name: "Women in Engineering",
+    unitType: "affinity_group",
+    unitTypeLabel: "Affinity Group",
+    parentId: "sb",
+    portalUrl: "/affinity/wie",
+    portalLabel: "WIE Affinity Portal",
     scope:
-      "Advances the participation and progression of women in engineering. Members run outreach, mentoring and STEM programmes for the campus and the surrounding schools.",
+      "Advances the participation and progression of women in engineering. Members run outreach, mentoring and STEM programmes for the campus and the surrounding schools under the Student Branch.",
     areas: ["Outreach and mentoring", "STEM programmes", "Career and interview support"],
     pending: ["Society mark", "Officer roster", "Session schedule"],
     colour: { brand: "#6B2FA0", ink: "#5A2288" },
   },
 ];
+
+/** Apex student branch */
+export const studentBranch = societies[0];
+/** The 3 technical chapters under the student branch */
+export const chapters = societies.filter((s) => s.unitType === "chapter");
+/** The affinity group under the student branch */
+export const affinityGroups = societies.filter((s) => s.unitType === "affinity_group");
+/** All subunits chartered directly under the student branch */
+export const subUnits = societies.filter((s) => s.parentId === "sb");
 
 /**
  * Lookup, not a second source of truth.

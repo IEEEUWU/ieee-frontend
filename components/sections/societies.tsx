@@ -1,14 +1,13 @@
 import { Section, SectionHeading } from "@/components/layout/shell";
-import { SocietyRail } from "@/components/sections/society-rail";
+import { BranchHierarchy } from "@/components/sections/branch-hierarchy";
 
 /**
- * Societies.
+ * Branch Hierarchy & Societies Section.
  *
- * A server component. Only the rail below it is a client island, so the heading,
- * the introduction and the section chrome all reach the browser as HTML.
- *
- * The heading stays static while the cards move horizontally. That contrast is
- * the point: the reader's eye is anchored by a fixed label and freed to travel.
+ * Demonstrates the IEEE organizational hierarchy:
+ * - Parent: IEEE Student Branch
+ * - 3 Technical Chapters: Industrial Automation Society, Computer Society, Robotics and Automation Society
+ * - 1 Affinity Group: Women in Engineering
  */
 export function Societies() {
   return (
@@ -16,15 +15,15 @@ export function Societies() {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
         <SectionHeading
           id="societies-title"
-          code="Five chartered societies"
-          title="Each one owns a discipline."
-          lede="Two are open to every undergraduate on campus. Three take members only through recruitment. The rail below lists all five with the charter scope each publishes under."
-          className="lg:col-span-5"
+          code="Organizational Hierarchy"
+          title="Everything operates under the Student Branch."
+          lede="The IEEE Student Branch is the umbrella parent organization. Three technical chapters lead specialized engineering disciplines, and the Women in Engineering affinity group advances representation. Select any unit in the tree to inspect its charter scope and details."
+          className="lg:col-span-8"
         />
       </div>
 
       <div className="mt-12 lg:mt-16">
-        <SocietyRail />
+        <BranchHierarchy />
       </div>
     </Section>
   );

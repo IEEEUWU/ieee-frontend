@@ -94,7 +94,7 @@ export function Hero() {
                   {site.joinLabel}
                 </ActionPrimary>
                 <ActionSecondary href="#societies">
-                  Browse the five societies
+                  Explore branch hierarchy
                 </ActionSecondary>
               </motion.div>
             </div>

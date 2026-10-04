@@ -38,7 +38,7 @@ export const site = {
 
 /** Primary navigation. Order matches the order sections appear on the page. */
 export const navLinks = [
-  { href: "#societies", label: "Societies" },
+  { href: "#societies", label: "Hierarchy" },
   { href: "#events", label: "Events" },
   { href: "#team", label: "Team" },
   { href: "#branch", label: "The branch" },
@@ -49,8 +49,8 @@ export const navLinks = [
  * the two never drift apart.
  */
 export const promise = {
-  headline: ["Five societies,", "one branch."],
-  lede: "Engineering and computing students at Uva Wellassa University build, compete and organise under one IEEE banner.",
+  headline: ["One student branch,", "three chapters, one group."],
+  lede: "Engineering and computing students at Uva Wellassa University organize under the IEEE Student Branch, powered by three specialized technical chapters and our Women in Engineering affinity group.",
 } as const;
 
 /**

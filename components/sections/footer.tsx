@@ -56,7 +56,7 @@ export function Footer() {
             className="mt-8 origin-bottom-left will-change-transform max-w-full"
           >
             <h2 className="text-[clamp(2rem,10.5vw,12rem)] sm:text-[clamp(2.75rem,13.5vw,12rem)] leading-[0.85] sm:leading-[0.82] tracking-[-0.055em] break-words">
-              <MaskedText lines={["Five societies.", "One branch."]} delay={0.1} />
+              <MaskedText lines={["One branch.", "Three chapters, one group."]} delay={0.1} />
             </h2>
           </motion.div>
 
@@ -69,7 +69,7 @@ export function Footer() {
           >
             <p className="max-w-[40ch] text-[clamp(1.0625rem,1.5vw,1.375rem)] leading-snug tracking-[-0.02em] md:col-span-5">
               Engineering and computing students at Uva Wellassa University,
-              organising under one IEEE banner.
+              organising under the IEEE Student Branch.
             </p>
 
             <div className="flex flex-wrap items-start gap-x-10 gap-y-4 md:col-span-4 md:col-start-9 md:justify-end">

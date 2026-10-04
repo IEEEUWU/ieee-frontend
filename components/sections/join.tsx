@@ -15,17 +15,17 @@ const routes = [
   {
     step: "01",
     title: "Attend a session",
-    body: "Sessions run under each society. Two societies are open to every undergraduate on campus, so no society membership is needed to sit in on a first one.",
+    body: "Sessions run under the three chapters and the WIE affinity group. Branch-wide events are open to every undergraduate on campus, so no membership is needed to attend.",
   },
   {
     step: "02",
     title: "Ask for the record",
-    body: "Founding year, officer roster, society marks. Six items from this page are still unpublished. Asking is the fastest way to get any of them filled in.",
+    body: "Founding year, officer roster, chapter marks. Six items from this page are still unpublished. Asking is the fastest way to get any of them filled in.",
   },
   {
     step: "03",
-    title: "Join a society",
-    body: "Recruitment runs per society, on their own terms and their own calendar. The explorer above names the areas each one covers.",
+    title: "Join a chapter or group",
+    body: "Recruitment runs per technical chapter and affinity group on their own terms and calendars. The hierarchy section above names the areas each one covers.",
   },
 ] as const;
 

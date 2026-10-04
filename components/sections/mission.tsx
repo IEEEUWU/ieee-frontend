@@ -35,10 +35,7 @@ export function Mission() {
           <Reveal delay={0.1} className="lg:col-span-5 lg:col-start-8">
             <div className="space-y-6 text-[clamp(1rem,1.25vw,1.1875rem)] leading-relaxed text-muted">
               <p>
-                Five societies hold charters under this branch. Each one owns a
-                discipline, runs its own sessions, and sends people to the same
-                committee meetings. The umbrella society runs the calendar that
-                holds all five together.
+                Everything operates under the IEEE Student Branch. Three technical chapters—Industrial Automation Society, Computer Society, and Robotics &amp; Automation Society—lead specialized disciplines, while the Women in Engineering affinity group advances participation, mentorship, and STEM progression.
               </p>
               <p>
                 Charter scope is fixed by IEEE and published here verbatim.
