@@ -83,6 +83,7 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
   }
 
   body {
@@ -222,42 +223,6 @@
   }
 
 
-  /* The page stack.
-     Each section is a page in a deck, and scrolling settles on a page boundary
-     instead of drifting past it.
-
-     `proximity`, never `mandatory`. Mandatory snap on a page with sections of
-     different lengths is hostile: a section taller than the viewport becomes
-     unreachable, and a reader who wants to stop halfway through a long ledger
-     cannot. Proximity only claims a snap point when the scroll has already
-     come to rest near one, so it never fights the reader — it just tidies up
-     where they stopped.
-
-     Gated on `prefers-reduced-motion: no-preference`, not on a media query for
-     motion alone: snap points are a change of scroll behaviour, and a reader who
-     has asked for less motion should get an ordinary continuous scroll.
-
-     `scroll-padding-top` is the fixed header's height plus a little air, so a
-     snapped section never parks its own heading underneath the bar. The rail
-     further down opts out with `scroll-snap-align: none`, because a horizontal
-     scroller inside a vertically snapping page will otherwise be fought over by
-     both axes at once. */
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-snap-type: y proximity;
-      scroll-padding-top: 5.5rem;
-    }
-
-    .page-stack > * {
-      scroll-snap-align: start;
-      scroll-snap-stop: normal;
-    }
-
-    /* Nested scrollers opt out of the vertical stack. */
-    .page-stack .no-scrollbar {
-      scroll-snap-align: none;
-    }
-  }
 
   /* Horizontal scroll surfaces. */
   .no-scrollbar {
@@ -410,13 +375,6 @@
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
-    }
-
-    /* Snap is scroll behaviour, not decoration, so it is withdrawn here with
-       everything else. A reader who has asked for reduced motion gets ordinary
-       continuous scrolling. */
-    html {
-      scroll-snap-type: none !important;
     }
 
     /* Restore the fully drawn resting state for the traces. */

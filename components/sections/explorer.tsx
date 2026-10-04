@@ -37,11 +37,14 @@ export function SocietyExplorer() {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
       <div className="lg:col-span-5">
+        <p className="mb-2 text-[12px] font-medium text-subtle lg:hidden">
+          Scroll horizontally to switch society
+        </p>
         <div
           role="tablist"
           aria-label="Society detail"
           aria-orientation="vertical"
-          className="flex gap-1 overflow-x-auto no-scrollbar lg:flex-col lg:overflow-visible"
+          className="-mx-5 flex gap-1.5 overflow-x-auto no-scrollbar px-5 pb-2 sm:-mx-8 sm:px-8 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
           onKeyDown={(event) => {
             switch (event.key) {
               case "ArrowRight":
@@ -81,24 +84,24 @@ export function SocietyExplorer() {
                 aria-controls={`${baseId}-panel`}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => setActive(index)}
-                className={`relative flex shrink-0 items-center justify-between gap-4 border px-4 py-4 text-left transition-colors duration-200 lg:w-full lg:px-5 ${
+                className={`relative flex shrink-0 items-center justify-between gap-3 sm:gap-4 border px-3.5 py-3 sm:px-4 sm:py-4 text-left transition-colors duration-200 lg:w-full lg:px-5 ${
                   selected
                     ? "border-text bg-background text-text"
                     : "border-border-subtle text-muted hover:border-border hover:text-text"
                 }`}
               >
-                <span className="flex items-center gap-3">
+                <span className="flex items-center gap-2.5 sm:gap-3">
                   {/* The active society keeps its own identity colour in the tab and in the
                       sliding marker, so the selected society is identifiable by
                       hue as well as by position. Inactive tabs stay neutral,
                       because five competing hues in a list would be noise. */}
                   <span
-                    className={`label-mono ${selected ? "" : "text-subtle"}`}
+                    className={`label-mono text-[12px] sm:text-[13px] ${selected ? "" : "text-subtle"}`}
                     style={selected ? { color: society.colour.ink } : undefined}
                   >
                     {society.abbreviation}
                   </span>
-                  <span className="text-[15px] font-semibold whitespace-nowrap">
+                  <span className="text-[13px] sm:text-[15px] font-semibold whitespace-nowrap">
                     {society.name}
                   </span>
                 </span>
@@ -109,7 +112,7 @@ export function SocietyExplorer() {
                   <motion.span
                     layoutId="explorer-marker"
                     aria-hidden="true"
-                    className="absolute inset-y-0 left-0 w-1"
+                    className="absolute inset-x-0 bottom-0 h-1 lg:inset-y-0 lg:left-0 lg:bottom-auto lg:h-full lg:w-1"
                     style={{ backgroundColor: society.colour.brand }}
                     transition={
                       reduced

@@ -27,6 +27,8 @@ export type PublicEvent = {
   location: string;
   /** One line on what attending involves. Optional: omit rather than pad. */
   note?: string;
+  /** Direct registration or RSVP URL. Defaults to #join when pending. */
+  rsvpUrl?: string;
   /**
    * The gallery plate.
    *
@@ -129,3 +131,18 @@ export const programmes = [
 export const eventsByDateDesc = [...publishedEvents].sort((a, b) =>
   b.date.localeCompare(a.date),
 );
+
+/**
+ * Builds a direct Google Calendar event creation URL for one-click scheduling.
+ */
+export function buildGoogleCalendarUrl(event: PublicEvent): string {
+  const cleanDate = event.date.replace(/-/g, "");
+  // Default to a 2-hour morning slot (09:30 - 11:30 local time)
+  const dates = `${cleanDate}T093000Z/${cleanDate}T113000Z`;
+  const text = encodeURIComponent(`IEEE UWU: ${event.title}`);
+  const details = encodeURIComponent(
+    `${event.note ?? ""}\n\nVenue: ${event.location}\nOrganized by IEEE Student Branch, Uva Wellassa University.`,
+  );
+  const location = encodeURIComponent(`${event.location}, Uva Wellassa University, Badulla, Sri Lanka`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}&location=${location}`;
+}

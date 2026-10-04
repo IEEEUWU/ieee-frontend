@@ -33,11 +33,8 @@ import { Footer } from "@/components/sections/footer";
  *   Join            action       three concrete routes
  *   Footer          recall       the promise, stated one last time
  *
- * `page-stack` is a hook and nothing more: it marks the direct children of
- * `main` as snap points so scrolling settles on a section boundary rather than
- * drifting past it. The whole behaviour lives in one media-query block in
- * `globals.css`, so a reader who prefers reduced motion gets an ordinary
- * continuous scroll and no component has to know the rule exists.
+ * `page-stack` provides the structural container for main landing sections,
+ * rendered in natural document flow with smooth responsive scrolling.
  */
 export default function Page() {
   return (

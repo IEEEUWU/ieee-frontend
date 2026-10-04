@@ -53,9 +53,9 @@ export function Footer() {
 
           <motion.div
             style={reduced ? undefined : { scale, y: settle }}
-            className="mt-8 origin-bottom-left will-change-transform"
+            className="mt-8 origin-bottom-left will-change-transform max-w-full"
           >
-            <h2 className="text-[clamp(2.75rem,13.5vw,12rem)] leading-[0.82] tracking-[-0.055em]">
+            <h2 className="text-[clamp(2rem,10.5vw,12rem)] sm:text-[clamp(2.75rem,13.5vw,12rem)] leading-[0.85] sm:leading-[0.82] tracking-[-0.055em] break-words">
               <MaskedText lines={["Five societies.", "One branch."]} delay={0.1} />
             </h2>
           </motion.div>

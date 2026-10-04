@@ -1,5 +1,11 @@
+import { ArrowRight, CalendarPlus } from "@phosphor-icons/react/ssr";
 import { societyById, societyInk } from "@/lib/units";
-import { eventsByDateDesc, programmes, type PublicEvent } from "@/lib/events";
+import {
+  buildGoogleCalendarUrl,
+  eventsByDateDesc,
+  programmes,
+  type PublicEvent,
+} from "@/lib/events";
 import { Shell } from "@/components/layout/shell";
 import { Photo, SampleNotice } from "@/components/ui/primitives";
 import { Reveal } from "@/components/motion/reveal";
@@ -142,6 +148,33 @@ function EventPlate({
           {event.note}
         </p>
       ) : null}
+
+      {/* Action controls: RSVP / Register and Add to Google Calendar */}
+      <div className="mt-6 flex flex-wrap items-center gap-3 pt-2">
+        <a
+          href={event.rsvpUrl ?? "#join"}
+          className="group inline-flex min-h-10 items-center gap-2 border border-text bg-text px-4 text-[13px] font-semibold text-background transition-colors duration-200 hover:border-primary hover:bg-primary"
+        >
+          <span>RSVP / Register</span>
+          <ArrowRight
+            size={14}
+            weight="bold"
+            aria-hidden="true"
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+          />
+        </a>
+
+        <a
+          href={buildGoogleCalendarUrl(event)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-10 items-center gap-2 border border-border px-3.5 text-[13px] font-semibold text-text transition-colors duration-200 hover:border-text hover:bg-surface"
+          title={`Add "${event.title}" to Google Calendar`}
+        >
+          <CalendarPlus size={16} weight="regular" aria-hidden="true" />
+          <span>Add to Calendar</span>
+        </a>
+      </div>
     </Reveal>
   );
 }

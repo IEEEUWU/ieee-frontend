@@ -137,10 +137,10 @@ export function JoinBlock() {
             viewport={{ once: true, margin: "-10% 0px" }}
             transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
           >
-            <Magnetic className="inline-flex">
+            <Magnetic className="inline-flex w-full sm:w-auto">
               <a
                 href="#societies"
-                className="group inline-flex min-h-14 items-center gap-3 bg-white px-7 text-[15px] font-semibold text-primary transition-colors duration-200 hover:bg-inverse-muted"
+                className="group inline-flex min-h-14 w-full sm:w-auto justify-center items-center gap-3 bg-white px-7 text-[15px] font-semibold text-primary transition-colors duration-200 hover:bg-inverse-muted"
               >
                 {site.joinLabel}
                 <ArrowRight
