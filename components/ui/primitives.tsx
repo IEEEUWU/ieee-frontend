@@ -27,6 +27,11 @@ export function Logo({
   /** Rendered width, used to pick the right image candidate. */
   sizes?: string;
 }) {
+  const hasHeight = className.includes("h-");
+  const hasWidth = className.includes("w-");
+  const baseClass = `${hasHeight ? "" : "h-auto"} ${hasWidth ? "" : "w-full"}`.trim();
+  const resolvedClass = `${baseClass} ${className}`.trim();
+
   return (
     <Image
       src={lockup.src}
@@ -35,7 +40,7 @@ export function Logo({
       height={lockup.intrinsicHeight}
       sizes={sizes}
       unoptimized
-      className={`h-auto w-full ${className}`}
+      className={resolvedClass}
     />
   );
 }
