@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IEEE UWU Student Branch">
+  <rect width="64" height="64" fill="#00629B"/>
+  <g fill="#ffffff" font-family="Archivo, Helvetica, Arial, sans-serif" font-weight="800" font-size="22" letter-spacing="-1">
+    <text x="32" y="30" text-anchor="middle">UWU</text>
+  </g>
+  <rect x="14" y="42" width="36" height="3" fill="#ffffff"/>
+</svg>
