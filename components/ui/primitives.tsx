@@ -34,6 +34,7 @@ export function Logo({
       width={lockup.intrinsicWidth}
       height={lockup.intrinsicHeight}
       sizes={sizes}
+      unoptimized
       className={`h-auto w-full ${className}`}
     />
   );

@@ -74,10 +74,10 @@ export function useEdgeScroll<T extends HTMLElement>(): EdgeScroll<T> {
       progressBar.current.style.transform = `scaleX(${0.08 + ratio * 0.92})`;
     }
 
-    setAtStart((prev) => (prev === el.scrollLeft <= 1 ? prev : el.scrollLeft <= 1));
-    setAtEnd((prev) =>
-      prev === el.scrollLeft >= max - 1 ? prev : el.scrollLeft >= max - 1,
-    );
+    const nextAtStart = el.scrollLeft <= 1;
+    const nextAtEnd = el.scrollLeft >= max - 1;
+    setAtStart((prev) => (prev === nextAtStart ? prev : nextAtStart));
+    setAtEnd((prev) => (prev === nextAtEnd ? prev : nextAtEnd));
   }, []);
 
   useEffect(() => {

@@ -39,7 +39,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative isolate flex h-[100svh] flex-col overflow-hidden bg-background"
+      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-background lg:h-[100svh]"
     >
       {/* Decorative trace layer behind the type. aria-hidden, inert, and drawn
           entirely in SVG with no JavaScript. */}
@@ -50,7 +50,7 @@ export function Hero() {
         <SignalTrace />
       </div>
 
-      <Shell className="hero__shell flex min-h-0 flex-1 flex-col pt-24 sm:pt-28 lg:pt-28">
+      <Shell className="hero__shell flex min-h-0 flex-1 flex-col pt-20 pb-8 sm:pt-24 sm:pb-8 lg:pt-28 lg:pb-0">
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8">
           {/* Type plane. Shrink-free on mobile so it always shows in full;
               stretched on desktop so the eyebrow pins to the top of the grid and
@@ -85,7 +85,7 @@ export function Hero() {
               </motion.p>
 
               <motion.div
-                className="hero__actions mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 lg:mt-10"
+                className="hero__actions mt-6 flex flex-col items-start gap-4 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-4 lg:mt-10"
                 initial={reduced ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
@@ -94,7 +94,7 @@ export function Hero() {
                   {site.joinLabel}
                 </ActionPrimary>
                 <ActionSecondary href="#societies">
-                  Browse the five societies
+                  Explore branch hierarchy
                 </ActionSecondary>
               </motion.div>
             </div>
@@ -106,7 +106,7 @@ export function Hero() {
               scroll, which is what lets the section settle cleanly on a snap
               boundary instead of drifting through it. It arrives by clipping
               open from the bottom edge. */}
-          <div className="hero__image relative z-10 min-h-0 flex-1 lg:col-span-5 lg:flex-none">
+          <div className="hero__image relative z-10 min-h-[220px] flex-1 sm:min-h-[260px] lg:col-span-5 lg:min-h-0 lg:flex-none">
             <div className="relative h-full">
               <motion.div
                 initial={reduced ? false : { clipPath: "inset(0 0 100% 0)" }}

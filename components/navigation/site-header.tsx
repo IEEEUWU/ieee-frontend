@@ -103,7 +103,7 @@ export function SiteHeader() {
         <Shell>
           <div
             className={`flex items-center justify-between gap-6 transition-[height] duration-300 ${
-              compact ? "h-16" : "h-20 lg:h-24"
+              compact || open ? "h-16" : "h-16 sm:h-20 lg:h-24"
             }`}
           >
             {/* The official branch lockup, unboxed and at native proportion.
