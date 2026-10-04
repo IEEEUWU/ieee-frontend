@@ -10,8 +10,8 @@
  */
 
 export const lockup = {
-  /** Official branch lockup, transparent RGBA, delivered unmanipulated. */
-  src: "/brand/uwu-sb-logo.png",
+  /** Official branch lockup, transparent vector SVG. */
+  src: "/brand/uwu-sb-logo.svg",
   intrinsicWidth: 8567,
   intrinsicHeight: 1313,
 } as const;
