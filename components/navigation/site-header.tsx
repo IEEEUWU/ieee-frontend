@@ -118,10 +118,12 @@ export function SiteHeader() {
               aria-label={`${site.branchName}, back to top`}
               className="-mx-2 flex min-h-11 items-center px-2"
             >
-              {/* h-4 at the 6.52:1 proportion is 104px wide, h-5 is 131px.
-                  `sizes` is set to the widest of those so the optimiser never
-                  over-fetches on a 2x display. */}
-              <Logo className="h-4 w-auto sm:h-5" sizes="131px" />
+              <Logo
+                className={`w-auto transition-[height] duration-300 ${
+                  compact ? "h-8 sm:h-9" : "h-8 sm:h-10 lg:h-12"
+                }`}
+                sizes="(min-width: 1024px) 320px, (min-width: 640px) 270px, 220px"
+              />
             </a>
 
             <div className="flex items-center gap-2 sm:gap-3">
