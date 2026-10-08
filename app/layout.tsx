@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
 /**
@@ -34,8 +34,20 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
+/**
+ * IBM Plex Sans carries the landing page. The source design is set entirely
+ * in Plex Sans at four weights; scoped rules under `.landing-page` swap the
+ * family in without touching the rest of the site.
+ */
+const plexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-plex-sans",
+  weight: ["400", "500", "600", "700"],
+});
+
 const SITE_URL = "https://ieee-uwu-student-branch.vercel.app";
-const TITLE = "IEEE Uva Wellassa Student Branch — five societies, one branch";
+const TITLE = "IEEE Uva Wellassa Student Branch: five societies, one branch";
 const DESCRIPTION =
   "Five chartered IEEE societies operating under one student branch at Uva Wellassa University, Badulla, Sri Lanka. Society scopes, technical areas, and a record that names what is still unpublished.";
 
@@ -43,7 +55,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s — IEEE UWU Student Branch",
+    template: "%s | IEEE UWU Student Branch",
   },
   description: DESCRIPTION,
   applicationName: "IEEE UWU Student Branch",
@@ -123,7 +135,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${archivo.variable} ${plexMono.variable}`}>
+    <html
+      lang="en-GB"
+      className={`${archivo.variable} ${plexMono.variable} ${plexSans.variable}`}
+    >
       <body>
         <script
           type="application/ld+json"

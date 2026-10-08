@@ -52,6 +52,11 @@ export type Society = {
   areas: readonly string[];
   /** Fields the branch has not supplied yet. Never filled in by guesswork. */
   pending: readonly string[];
+  /**
+   * The unit's published chapter lockup, once the branch has supplied one.
+   * `null` while it has not; it is never guessed.
+   */
+  logo: { readonly src: string; readonly width: number; readonly height: number } | null;
   colour: SocietyColour;
   /** Organizational hierarchy type */
   unitType: UnitType;
@@ -80,15 +85,16 @@ export const societies: readonly Society[] = [
     areas: ["Branch governance", "Public events & hackathons", "Inter-chapter initiatives"],
     pending: ["Branch officer roster", "Annual activity report"],
     colour: { brand: "#00629B", ink: "#00629B" },
+    logo: null,
   },
   {
     id: "ias",
     abbreviation: "IAS",
-    name: "Industrial Automation Society",
+    name: "Industry Applications Society",
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/ias",
+    portalUrl: "/ias",
     portalLabel: "IAS Chapter Portal",
     scope:
       "Process control, instrumentation and factory automation. Members work on control loops, plant logic and the measurement systems that run real equipment.",
@@ -97,8 +103,9 @@ export const societies: readonly Society[] = [
       "PLC and distributed control",
       "Energy and industry practice",
     ],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#00843D", ink: "#00622E" },
+    logo: { src: "/brand/chapters/uwu-ias.png", width: 2100, height: 618 },
   },
   {
     id: "cs",
@@ -107,13 +114,14 @@ export const societies: readonly Society[] = [
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/cs",
+    portalUrl: "/cs",
     portalLabel: "Computer Society Portal",
     scope:
       "Computing practice end to end: languages, systems, networks, data and security. Members build software, run infrastructure and test systems on purpose.",
     areas: ["Software and systems", "Networks and security", "Data and machine learning"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#E8730C", ink: "#B4530A" },
+    logo: { src: "/brand/chapters/uwu-cs.png", width: 936, height: 432 },
   },
   {
     id: "ras",
@@ -122,13 +130,14 @@ export const societies: readonly Society[] = [
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/ras",
+    portalUrl: "/ras",
     portalLabel: "RAS Chapter Portal",
     scope:
       "Robotics, mechatronics and control. Members build machines that sense and act, from embedded controllers through to autonomous platforms.",
     areas: ["Embedded systems", "Robot design and control", "Autonomous platforms"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#A6192E", ink: "#8C1526" },
+    logo: { src: "/brand/chapters/uwu-ras.png", width: 1920, height: 492 },
   },
   {
     id: "wie",
@@ -137,66 +146,13 @@ export const societies: readonly Society[] = [
     unitType: "affinity_group",
     unitTypeLabel: "Affinity Group",
     parentId: "sb",
-    portalUrl: "/affinity/wie",
+    portalUrl: "/wie",
     portalLabel: "WIE Affinity Portal",
     scope:
       "Advances the participation and progression of women in engineering. Members run outreach, mentoring and STEM programmes for the campus and the surrounding schools under the Student Branch.",
     areas: ["Outreach and mentoring", "STEM programmes", "Career and interview support"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#6B2FA0", ink: "#5A2288" },
+    logo: { src: "/brand/chapters/uwu-wie.png", width: 920, height: 136 },
   },
 ];
-
-/** Apex student branch */
-export const studentBranch = societies[0];
-/** The 3 technical chapters under the student branch */
-export const chapters = societies.filter((s) => s.unitType === "chapter");
-/** The affinity group under the student branch */
-export const affinityGroups = societies.filter((s) => s.unitType === "affinity_group");
-/** All subunits chartered directly under the student branch */
-export const subUnits = societies.filter((s) => s.parentId === "sb");
-
-/**
- * Lookup, not a second source of truth.
- *
- * Four components need to resolve a `SocietyId` to a society, and three of them
- * were each rebuilding a `Map` at module scope to do it. That is one lookup
- * written four times, and it drifts the moment a section needs a different
- * accessor. It lives here, once, next to the data it indexes.
- *
- * `Map` rather than a plain object so a bad id yields `undefined` under a type
- * check, instead of quietly producing a prototype member.
- */
-const index: ReadonlyMap<SocietyId, Society> = new Map(
-  societies.map((item) => [item.id, item]),
-);
-
-/**
- * Resolve a society by id.
- *
- * Every `SocietyId` in this codebase is produced by iterating `societies` or from
- * the union declared above, so a miss means the data is internally inconsistent
- * rather than that a reader typed something wrong. Returning `Society` and
- * throwing is the honest signature: it turns a rendering bug into a loud failure
- * instead of an `undefined.colour` crash three components later.
- */
-export function societyById(id: SocietyId): Society {
-  const found = index.get(id);
-  if (!found) {
-    throw new Error(`Unknown society id: ${id}`);
-  }
-  return found;
-}
-
-/**
- * The text-safe colour for a society, or `undefined` where there is no society —
- * a branch-wide committee seat, or a marquee entry that is an institutional fact
- * rather than a charter scope.
- *
- * Null-tolerant on purpose, so no caller has to repeat the same guard.
- */
-export function societyInk(
-  id: SocietyId | null | undefined,
-): string | undefined {
-  return id ? index.get(id)?.colour.ink : undefined;
-}

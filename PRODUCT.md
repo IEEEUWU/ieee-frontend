@@ -49,7 +49,7 @@ Students browse from campus Wi-Fi and mobile devices on mobile browsers as well 
 ## Evidence on Hand
 
 - Official branch lockup: `public/brand/uwu-sb-logo.png`
-- Five confirmed societies: Student Branch (SB), Industrial Automation Society (IAS), Computer Society (CS), Robotics and Automation Society (RAS), Women in Engineering (WIE) (`lib/units.ts`)
+- Five confirmed societies: Student Branch (SB), Industry Applications Society (IAS), Computer Society (CS), Robotics and Automation Society (RAS), Women in Engineering (WIE) (`lib/units.ts`)
 - Section co-branding profiles and parent addresses in Colombo Trace Expert City (`lib/site.ts`)
 - Undated programme structure: society sessions, committee meetings, and Section programmes (`lib/events.ts`), which are constitutional facts rather than dated claims
 - Committee structure: three branch-wide offices plus one officer seat per chartered society (`lib/team.ts`)
