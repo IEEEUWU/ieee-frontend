@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { societies, type SocietyId } from "@/lib/units";
@@ -60,6 +61,16 @@ export default async function UnitPortalPage({ params }: PageProps) {
           {/* Unit Hero Header */}
           <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
+              {unit.logo ? (
+                <Image
+                  src={unit.logo.src}
+                  alt=""
+                  width={unit.logo.width}
+                  height={unit.logo.height}
+                  sizes="224px"
+                  className="mb-6 h-14 w-56 object-contain object-left"
+                />
+              ) : null}
               <div className="flex flex-wrap items-center gap-3">
                 <span
                   className="size-3 rounded-full"

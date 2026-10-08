@@ -52,6 +52,11 @@ export type Society = {
   areas: readonly string[];
   /** Fields the branch has not supplied yet. Never filled in by guesswork. */
   pending: readonly string[];
+  /**
+   * The unit's published chapter lockup, once the branch has supplied one.
+   * `null` while it has not; it is never guessed.
+   */
+  logo: { readonly src: string; readonly width: number; readonly height: number } | null;
   colour: SocietyColour;
   /** Organizational hierarchy type */
   unitType: UnitType;
@@ -80,6 +85,7 @@ export const societies: readonly Society[] = [
     areas: ["Branch governance", "Public events & hackathons", "Inter-chapter initiatives"],
     pending: ["Branch officer roster", "Annual activity report"],
     colour: { brand: "#00629B", ink: "#00629B" },
+    logo: null,
   },
   {
     id: "ias",
@@ -97,8 +103,9 @@ export const societies: readonly Society[] = [
       "PLC and distributed control",
       "Energy and industry practice",
     ],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#00843D", ink: "#00622E" },
+    logo: { src: "/brand/chapters/uwu-ias.png", width: 2100, height: 618 },
   },
   {
     id: "cs",
@@ -112,8 +119,9 @@ export const societies: readonly Society[] = [
     scope:
       "Computing practice end to end: languages, systems, networks, data and security. Members build software, run infrastructure and test systems on purpose.",
     areas: ["Software and systems", "Networks and security", "Data and machine learning"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#E8730C", ink: "#B4530A" },
+    logo: { src: "/brand/chapters/uwu-cs.png", width: 936, height: 432 },
   },
   {
     id: "ras",
@@ -127,8 +135,9 @@ export const societies: readonly Society[] = [
     scope:
       "Robotics, mechatronics and control. Members build machines that sense and act, from embedded controllers through to autonomous platforms.",
     areas: ["Embedded systems", "Robot design and control", "Autonomous platforms"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#A6192E", ink: "#8C1526" },
+    logo: { src: "/brand/chapters/uwu-ras.png", width: 1920, height: 492 },
   },
   {
     id: "wie",
@@ -142,7 +151,8 @@ export const societies: readonly Society[] = [
     scope:
       "Advances the participation and progression of women in engineering. Members run outreach, mentoring and STEM programmes for the campus and the surrounding schools under the Student Branch.",
     areas: ["Outreach and mentoring", "STEM programmes", "Career and interview support"],
-    pending: ["Society mark", "Officer roster", "Session schedule"],
+    pending: ["Officer roster", "Session schedule"],
     colour: { brand: "#6B2FA0", ink: "#5A2288" },
+    logo: { src: "/brand/chapters/uwu-wie.png", width: 920, height: 136 },
   },
 ];

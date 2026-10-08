@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { NAV_LINKS } from "./data";
 import { TEXT_15_MED } from "./styles";
 
@@ -7,7 +8,8 @@ import { TEXT_15_MED } from "./styles";
  *
  * Not sticky: it scrolls away with the page, exactly as the source does.
  * The lockup is sized to the bar's 36px content height so the nav keeps
- * its original 84.8px rhythm.
+ * its original 84.8px rhythm. Shared verbatim across routes, so the
+ * anchors in `NAV_LINKS` and the join action point at the homepage.
  */
 export function LandingNav() {
   return (
@@ -29,16 +31,16 @@ export function LandingNav() {
             key={link.href}
             className={TEXT_15_MED}
           >
-            <a href={link.href}>{link.label}</a>
+            <Link href={link.href}>{link.label}</Link>
           </p>
         ))}
-        <a
+        <Link
           data-land="nav-join"
-          href="#join"
+          href="/#join"
           className="rounded-full bg-[#00629B] px-5 py-2.5 text-[14px] font-semibold text-white"
         >
           Join IEEE
-        </a>
+        </Link>
       </div>
     </nav>
   );

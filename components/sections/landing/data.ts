@@ -6,22 +6,23 @@
  * stays auditable in one place.
  */
 import {
-  Cpu,
   Envelope,
-  Factory,
   GithubLogo,
   LinkedinLogo,
-  Robot,
-  Users,
   XLogo,
 } from "@phosphor-icons/react/ssr";
 import type { Icon } from "@phosphor-icons/react";
 
+/**
+ * Primary navigation. Hrefs are root-absolute so the shared nav works from
+ * any route: on the homepage a same-document `/#anchor` still jumps without
+ * a reload, and from `/events` it returns to the homepage section.
+ */
 export const NAV_LINKS = [
-  { href: "#about", label: "About" },
-  { href: "#chapters", label: "Chapters" },
-  { href: "#events", label: "Events" },
-  { href: "#committee", label: "Committee" },
+  { href: "/#about", label: "About" },
+  { href: "/#chapters", label: "Chapters" },
+  { href: "/#events", label: "Events" },
+  { href: "/#committee", label: "Committee" },
 ] as const;
 
 export const STATS = [
@@ -34,7 +35,7 @@ export const STATS = [
 export const CHAPTERS = [
   {
     tag: "CHAPTER 01",
-    icon: Cpu,
+    logo: { src: "/brand/chapters/uwu-cs.png", width: 936, height: 432 },
     title: "Computer Society",
     description:
       "Software, AI, cybersecurity and cloud: hackathons, coding nights and talks with industry engineers.",
@@ -42,7 +43,7 @@ export const CHAPTERS = [
   },
   {
     tag: "CHAPTER 02",
-    icon: Factory,
+    logo: { src: "/brand/chapters/uwu-ias.png", width: 2100, height: 618 },
     title: "Industry Applications Society",
     description:
       "Bridging classroom theory and industry practice through industrial visits, power systems and process engineering projects.",
@@ -50,7 +51,7 @@ export const CHAPTERS = [
   },
   {
     tag: "CHAPTER 03",
-    icon: Robot,
+    logo: { src: "/brand/chapters/uwu-ras.png", width: 1920, height: 492 },
     title: "Robotics and Automation Society",
     description:
       "Designing, building and programming intelligent machines: from line followers to autonomous systems.",
@@ -58,7 +59,7 @@ export const CHAPTERS = [
   },
   {
     tag: "AFFINITY GROUP",
-    icon: Users,
+    logo: { src: "/brand/chapters/uwu-wie.png", width: 920, height: 136 },
     title: "Women in Engineering",
     description:
       "Inspiring and empowering women in STEM through mentorship, leadership programs and outreach.",
@@ -74,6 +75,7 @@ export const EVENTS = [
     description:
       "A 24-hour build sprint hosted by the Computer Society: form a team, ship a prototype, pitch to judges.",
     tag: "Computer Society",
+    cover: "/photos/events/vision-code.jpg",
   },
   {
     day: "08",
@@ -82,6 +84,7 @@ export const EVENTS = [
     description:
       "Design and race autonomous line-following robots in the Robotics and Automation Society's annual competition.",
     tag: "RAS",
+    cover: "/photos/events/ros-robot.jpg",
   },
   {
     day: "22",
@@ -90,6 +93,7 @@ export const EVENTS = [
     description:
       "An evening of talks and mentoring with women engineers from Sri Lanka's leading tech companies.",
     tag: "WIE",
+    cover: "/photos/events/cv-clinic.jpg",
   },
 ] as const;
 

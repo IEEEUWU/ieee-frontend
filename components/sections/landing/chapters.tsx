@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "motion/react";
 import { CHAPTERS } from "./data";
 import { SectionHeading } from "./heading";
@@ -14,16 +15,12 @@ import { hoverSpring } from "./hover";
 const TONE = {
   light: {
     card: `${BORDER_CARD} bg-white`,
-    iconBox: "bg-[#00629B14]",
-    icon: "text-[#00629B]",
     tag: "text-[#8796A5]",
     title: "text-[#0B1B2B]",
     body: "text-[#4A5B6B]",
   },
   dark: {
     card: "bg-[#00629B]",
-    iconBox: "bg-[#FFFFFF26]",
-    icon: "text-white",
     tag: "text-[rgba(255,255,255,0.7)]",
     title: "text-white",
     body: "text-[rgba(255,255,255,0.8)]",
@@ -53,7 +50,6 @@ export function LandingChapters() {
         className="grid w-full auto-rows-fr grid-cols-2 gap-5"
       >
         {CHAPTERS.map((chapter) => {
-          const Icon = chapter.icon;
           const tone = chapter.dark ? TONE.dark : TONE.light;
           return (
             <motion.article
@@ -68,11 +64,26 @@ export function LandingChapters() {
               transition={hoverSpring}
             >
               <div className="flex w-full flex-row items-center justify-between">
-                <div
-                  className={`flex h-14 w-14 flex-row items-center justify-center rounded-2xl ${tone.iconBox}`}
-                >
-                  <Icon size={28} weight="regular" className={tone.icon} />
-                </div>
+                {/* One identical slot for every chapter: a 224x56 box,
+                    contained and left-aligned, so cards of any logo
+                    proportion hold the same footprint. The box is wider than
+                    the widest lockup at full height (RAS 218px), so CS, IAS
+                    and RAS all reach h-14 while the ultra-wide WIE strip
+                    letterboxes across the slot. On the dark card the ink is
+                    knocked out to white: dark purple on the brand ground
+                    would disappear. */}
+                <Image
+                  src={chapter.logo.src}
+                  alt=""
+                  width={chapter.logo.width}
+                  height={chapter.logo.height}
+                  sizes="224px"
+                  className={
+                    chapter.dark
+                      ? "h-14 w-56 shrink-0 object-contain object-left brightness-0 invert"
+                      : "h-14 w-56 shrink-0 object-contain object-left"
+                  }
+                />
                 <p className={`${LABEL_XS} ${tone.tag}`}>{chapter.tag}</p>
               </div>
               <div className="flex w-full flex-col items-start gap-2.5">
