@@ -65,7 +65,7 @@ export const photos = {
      Five frames, one per gallery plate, keyed to the event they illustrate.
 
      These are CC0 and carry no `credit`, because CC0 requires no attribution.
-     Source is recorded in the comment beside each anyway — a future editor
+     Source is recorded in the comment beside each anyway, a future editor
      replacing them needs to know where the frame came from, and that is not
      something the absence of a credit line should have to answer.
 
@@ -127,7 +127,7 @@ export const photos = {
  *
  * The cast is load-bearing rather than a shortcut. `as const satisfies
  * Record<string, Photo>` keeps each frame's literal types, so `Object.values`
- * infers a union of the *specific* frame shapes — and a CC0 frame genuinely has
+ * infers a union of the *specific* frame shapes, and a CC0 frame genuinely has
  * no `credit` property, so `frame.credit` does not type-check on the union.
  * Widening to the declared `Photo` first is what puts the optional property back
  * on the type, and it is sound because `satisfies` already proved every member

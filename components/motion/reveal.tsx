@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
-import type { ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
 
 /**
  * Motion primitives.
@@ -17,131 +16,11 @@ import type { ReactNode } from "react";
 export const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** Shared duration scale. Everything is a multiple of 60ms. */
-export const DURATION = {
+const DURATION = {
   fast: 0.24,
   base: 0.48,
   slow: 0.8,
 } as const;
-
-type RevealProps = {
-  children: ReactNode;
-  /** Seconds. Stagger between siblings when used inside a stagger group. */
-  delay?: number;
-  /** Travel distance in pixels. Zero gives a pure fade. */
-  y?: number;
-  x?: number;
-  className?: string;
-  as?: "div" | "li" | "section" | "article" | "header" | "footer";
-};
-
-/**
- * Reveal: the section-level entrance. Fades and translates into place the first
- * time it enters the viewport, then never animates again.
- *
- * Under `prefers-reduced-motion: reduce` the element is rendered in its final
- * state immediately, with no transform and no opacity change, so the page is
- * fully readable rather than merely unanimated.
- */
-export function Reveal({
-  children,
-  delay = 0,
-  y = 24,
-  x = 0,
-  className,
-  as = "div",
-}: RevealProps) {
-  const reduced = useReducedMotion();
-  const Component = motion[as];
-
-  if (reduced) {
-    const Static = as;
-    return <Static className={className}>{children}</Static>;
-  }
-
-  return (
-    <Component
-      className={className}
-      initial={{ opacity: 0, y, x }}
-      whileInView={{ opacity: 1, y: 0, x: 0 }}
-      viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
-      transition={{ duration: DURATION.slow, delay, ease: EASE }}
-    >
-      {children}
-    </Component>
-  );
-}
-
-const groupVariants: Variants = {
-  hidden: {},
-  shown: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  shown: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: DURATION.base, ease: EASE },
-  },
-};
-
-/**
- * Stagger: a parent that reveals its children in sequence. Used where a list
- * reads as one thought arriving in parts rather than as N separate items.
- */
-export function Stagger({
-  children,
-  className,
-  as = "div",
-}: {
-  children: ReactNode;
-  className?: string;
-  as?: "div" | "ul" | "ol";
-}) {
-  const reduced = useReducedMotion();
-  const Component = motion[as];
-
-  if (reduced) {
-    const Static = as;
-    return <Static className={className}>{children}</Static>;
-  }
-
-  return (
-    <Component
-      className={className}
-      variants={groupVariants}
-      initial="hidden"
-      whileInView="shown"
-      viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-    >
-      {children}
-    </Component>
-  );
-}
-
-export function StaggerItem({
-  children,
-  className,
-  as = "div",
-}: {
-  children: ReactNode;
-  className?: string;
-  as?: "div" | "li";
-}) {
-  const reduced = useReducedMotion();
-  const Component = motion[as];
-
-  if (reduced) {
-    const Static = as;
-    return <Static className={className}>{children}</Static>;
-  }
-
-  return (
-    <Component className={className} variants={itemVariants}>
-      {children}
-    </Component>
-  );
-}
 
 /**
  * Masked word reveal: the hero headline arriving word by word.

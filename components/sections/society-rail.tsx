@@ -1,1 +1,0 @@
-export { BranchHierarchy as SocietyRail } from "@/components/sections/branch-hierarchy";

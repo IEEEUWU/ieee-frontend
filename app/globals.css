@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   IEEE Uva Wellassa Student Branch — design system
+   IEEE Uva Wellassa Student Branch design system
    ---------------------------------------------------------------------------
    COLOUR
      IEEE Blue #00629B is the page's structural colour: rules, links, the join
@@ -68,6 +68,7 @@
   /* Type */
   --font-sans: var(--font-archivo), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-plex: var(--font-plex-sans), "IBM Plex Sans", system-ui, sans-serif;
 }
 
 @layer base {
@@ -113,6 +114,36 @@
     text-wrap: pretty;
   }
 
+  /* ---- Landing page scope ---------------------------------------------
+     The landing page is a faithful rebuild of an externally designed
+     page. Its layout, type and colours are Tailwind utilities on the
+     sections themselves; only the overrides below stay here, because
+     text-wrap is not inherited and cannot be set from a root utility.
+     These rules win over the element rules above on specificity while
+     staying inside the base layer, so utilities (text-pretty, font
+     weights) still outrank them. `main.landing-page` is the hook. */
+  .landing-page p {
+    text-wrap: wrap;
+  }
+
+  .landing-page h2,
+  .landing-page h3,
+  .landing-page h4 {
+    /* `normal` is not a valid text-wrap value (Chrome drops the
+       declaration); `auto` is the non-balancing keyword. */
+    text-wrap-style: auto;
+  }
+
+  /* Anchors land on the section top: the bar is not sticky here. */
+  html:has(.landing-page) {
+    scroll-padding-top: 0;
+  }
+
+  /* The source paints the ground on <body> itself. */
+  body:has(.landing-page) {
+    background-color: #f7f9fb;
+  }
+
   ::selection {
     background-color: var(--color-primary);
     color: #fff;
@@ -122,16 +153,6 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 3px;
     border-radius: 1px;
-  }
-
-  /* On the blue ground a blue focus ring would vanish. */
-  .on-inverse :focus-visible {
-    outline-color: #fff;
-  }
-
-  .on-inverse ::selection {
-    background-color: #fff;
-    color: var(--color-primary-deep);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -187,70 +208,6 @@
     text-decoration-color: currentColor;
   }
 
-  /* Duotone photography. The image is desaturated, then flooded with the brand
-     hue, so every photograph on the page belongs to the same palette. */
-  .duotone {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background-color: var(--color-primary-deep);
-  }
-
-  .duotone img {
-    filter: grayscale(1) contrast(1.06) brightness(1.04);
-  }
-
-  .duotone::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--color-primary);
-    mix-blend-mode: color;
-    z-index: 1;
-  }
-
-  .duotone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgb(0 98 155 / 0.15) 0%,
-      rgb(0 40 66 / 0.55) 100%
-    );
-    mix-blend-mode: multiply;
-    z-index: 2;
-  }
-
-
-
-  /* Horizontal scroll surfaces. */
-  .no-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Soft edges where a horizontal band runs off the viewport. */
-  .edge-fade {
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent 0,
-      #000 4rem,
-      #000 calc(100% - 4rem),
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent 0,
-      #000 4rem,
-      #000 calc(100% - 4rem),
-      transparent 100%
-    );
-  }
 }
 
 @layer utilities {
@@ -275,179 +232,18 @@
       animation: scroll-progress linear both;
       animation-timeline: scroll(root block);
     }
-
-    /* Infinite ticker. Duplicated track, so the seam is never visible. */
-    @keyframes marquee {
-      from {
-        transform: translate3d(0, 0, 0);
-      }
-      to {
-        transform: translate3d(-50%, 0, 0);
-      }
-    }
-
-    .marquee-track {
-      animation: marquee var(--marquee-duration, 38s) linear infinite;
-    }
-
-    .marquee:hover .marquee-track {
-      animation-play-state: paused;
-    }
-
-    /* A rule drifting against the type above it. The one scroll-linked transform
-       left on the page: it is a hairline, it moves 12% of its own width, and it
-       has no content to misalign, so it adds depth without fighting the section
-       snap the way a moving image did. */
-    @keyframes drift-rule {
-      from {
-        transform: translate3d(6%, 0, 0);
-      }
-      to {
-        transform: translate3d(-6%, 0, 0);
-      }
-    }
-
-    .drift-rule {
-      animation: drift-rule linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-    }
-
-    /* Single load-in. Plays once, then hands the element back to the browser. */
-    @keyframes rise-in {
-      from {
-        opacity: 0;
-        transform: translate3d(0, 24px, 0);
-      }
-      to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-      }
-    }
-
-    .rise-in {
-      animation: rise-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    /* Signal traces draw themselves in as the block enters the viewport. Paths
-       declare pathLength=1, so a single dash unit is the whole route and the
-       draw is one dashoffset rather than a per-path length lookup. */
-    @keyframes trace-draw {
-      from {
-        stroke-dasharray: 0 1;
-      }
-      to {
-        stroke-dasharray: 1 0;
-      }
-    }
-
-    .trace-draw {
-      stroke-dasharray: 0 1;
-      animation: trace-draw 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    @keyframes trace-pad-in {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    .trace-pad {
-      opacity: 0;
-      animation: trace-pad-in 300ms ease-out both;
-      animation-delay: 900ms;
-    }
   }
 
   /* Everything above is opt-in and motion-gated. With reduced motion the
      resting state is already the finished composition, so the page loses
      nothing but the movement. */
   @media (prefers-reduced-motion: reduce) {
-    .scroll-progress,
-    .marquee-track,
-    .drift-rule,
-    .rise-in,
-    .trace-draw,
-    .trace-pad {
+    .scroll-progress {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
     }
-
-    /* Restore the fully drawn resting state for the traces. */
-    .trace-draw {
-      stroke-dasharray: 1 0 !important;
-    }
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Hero, short landscape viewports.
 
-   These rules are deliberately unlayered, and that is the whole point of where
-   they sit.
-
-   The hero's sizing is written as Tailwind utilities on the elements themselves
-   (`text-[clamp(2.75rem,7vw,6rem)]`, `pt-24 sm:pt-28`, `mt-6`). An override
-   placed in `@layer components` loses to those no matter how specific it is:
-   cascade layers are compared *before* specificity, and `utilities` is
-   declared after `components`. An earlier attempt to fix this by prefixing
-   the selectors with `#top` did nothing at all, for exactly that reason: the
-   rule compiled, the media query matched, and the declaration was then
-   discarded by layer order.
-
-   Unlayered rules outrank every layer, so these win without `!important`.
-   That is the honest mechanism: the earlier rule was not broken CSS, it was
-   broken precedence, and precedence is what had to change.
-
-   The problem being solved: a phone turned sideways, or a laptop window with
-   the browser chrome eating a third of the height, cannot fit a display
-   headline, a supporting line, a call to action and a photograph in 390px.
-   Dropping the image is the right trade — the hero still fills exactly one
-   screen, it just spends that screen on words.
-
-   Everything else is compressed rather than removed. The eyebrow, the headline,
-   the lede and both actions all stay, because a hero that silently drops its
-   primary call to action is worse than a tight one.
-
-   Height-based, not width-based: a 1024x600 laptop window is wide but short, and
-   the width breakpoints would never see it.
-   --------------------------------------------------------------------------- */
-@media (max-height: 560px) and (orientation: landscape) {
-  #top .hero__image {
-    display: none;
-  }
-
-  /* Pull the type off the top edge: the fixed header overlays roughly 56px
-     here, so the previous 96px of padding was spending a quarter of the
-     viewport on clearance. */
-  #top .hero__shell {
-    padding-top: 4.25rem;
-  }
-
-  #top .hero__type {
-    justify-content: center;
-    gap: 0.875rem;
-  }
-
-  /* The viewport-width ramp is wrong for this case entirely — 7vw of 844 is
-     59px, which is right on a 900px-tall screen but not once the lede and the
-     actions need room too. Height is what is scarce, so the ramp switches to vh:
-     390px of viewport yields about 32px of headline. */
-  #top .hero__title {
-    font-size: clamp(1.75rem, 5.2vh + 0.75rem, 2.5rem);
-  }
-
-  #top .hero__lede {
-    margin-top: 0.75rem;
-    font-size: 0.9375rem;
-    line-height: 1.5;
-  }
-
-  #top .hero__actions {
-    margin-top: 1.125rem;
-  }
-}
