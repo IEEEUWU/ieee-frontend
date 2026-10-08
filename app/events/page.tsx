@@ -65,13 +65,13 @@ export default function Page() {
   return (
     <main
       id="main"
-      className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-[family-name:var(--font-plex)] leading-[1.2] normal-nums"
+      className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-plex leading-[1.2] normal-nums"
     >
       <LandingNav />
       {/* The section carries its own h2; this keeps one h1 per page without
           adding a second visible heading directly above it. */}
       <h1 className="sr-only">Events</h1>
-      <div data-land="spacer" className="h-[120px] w-full" />
+      <div data-land="spacer" className="h-30 w-full" />
       <LandingEventCards />
       <LandingFooter />
     </main>

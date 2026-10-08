@@ -63,13 +63,13 @@ export function UnitPeople({
             <div
               key={`${group.label ?? "members"}-${rowIndex}`}
               className={`flex w-full flex-row flex-wrap items-start justify-center gap-5 ${
-                group.narrow ? "max-w-[760px]" : "max-w-full"
+                group.narrow ? "max-w-190" : "max-w-full"
               }`}
             >
               {row.map((member, memberIndex) => (
                 <article
                   key={`${member.role}-${memberIndex}`}
-                  className={`${BORDER_CARD} flex w-[240px] shrink-0 flex-col items-start gap-4 rounded-3xl bg-white px-3 pb-5 pt-3`}
+                  className={`${BORDER_CARD} flex w-60 shrink-0 flex-col items-start gap-4 rounded-3xl bg-white px-3 pb-5 pt-3`}
                 >
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
                     <Image
@@ -84,7 +84,7 @@ export function UnitPeople({
                     <p className="w-full text-[18px] font-semibold text-[#0B1B2B]">
                       {member.name}
                     </p>
-                    <p className="w-full text-[15px] text-[color:var(--unit-ink)]">
+                    <p className="w-full text-[15px] text-(--unit-ink)">
                       {member.role}
                     </p>
                   </div>
@@ -98,7 +98,7 @@ export function UnitPeople({
                           target="_blank"
                           rel="noreferrer"
                           aria-label={social.label(member)}
-                          className="flex h-9 w-9 flex-row items-center justify-center rounded-full bg-[color:var(--unit-tint)]"
+                          className="flex h-9 w-9 flex-row items-center justify-center rounded-full bg-(--unit-tint)"
                           whileHover={{
                             backgroundColor: hoverBg,
                             scale: 1.1,
@@ -108,7 +108,7 @@ export function UnitPeople({
                           <Icon
                             size={18}
                             weight="regular"
-                            className="text-[color:var(--unit-brand)]"
+                            className="text-(--unit-brand)"
                           />
                         </motion.a>
                       );

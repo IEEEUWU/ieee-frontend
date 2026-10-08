@@ -11,6 +11,8 @@ import { BORDER_CARD, LABEL_SM } from "@/components/sections/landing/styles";
  * canvas rhythm as the homepage sections. `center` switches to the form the
  * homepage's committee section uses — centred title, no lede, the section's
  * own 7px rhythm — because people sections keep that structure verbatim.
+ * Each shell carries 72px of top padding, which joins the root's 48px gap
+ * into the homepage's exact 120px separation between sections.
  * Content composes its own state: filled when the branch has supplied the
  * data, `PendingCard` when it has not.
  */
@@ -32,7 +34,7 @@ export function UnitSection({
     return (
       <section
         id={id}
-        className="flex w-full max-w-[1120px] flex-col items-center gap-7"
+        className="flex w-full max-w-280 flex-col items-center gap-7 pt-18"
       >
         <SectionHeading center title={title} />
         <div className="flex w-full flex-col items-center gap-7">
@@ -45,7 +47,7 @@ export function UnitSection({
   return (
     <section
       id={id}
-      className="flex w-full max-w-[1120px] flex-col items-start gap-8"
+      className="flex w-full max-w-280 flex-col items-start gap-12 pt-18"
     >
       <SectionHeading title={title} lede={lede} />
       <div className="flex w-full flex-col gap-5">{children}</div>
@@ -64,7 +66,7 @@ export function UnitSection({
  * 13px tracked label doing the job it was written for: naming a state.
  */
 export function PendingCard({
-  title = "Awaiting Official Publication",
+  title = "AWAITING OFFICIAL PUBLICATION",
   children,
 }: {
   title?: string;
@@ -76,7 +78,7 @@ export function PendingCard({
         size={20}
         weight="bold"
         aria-hidden="true"
-        className="mt-0.5 shrink-0 text-[color:var(--unit-brand)]"
+        className="mt-0.5 shrink-0 text-(--unit-brand)"
       />
       <div className="flex flex-col gap-2">
         <h3 className={`${LABEL_SM} text-[#8796A5]`}>{title}</h3>

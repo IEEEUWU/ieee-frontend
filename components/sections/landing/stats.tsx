@@ -9,7 +9,7 @@ export function LandingStats() {
   return (
     <section
       data-land="stats"
-      className={`${BORDER_STATS} grid w-full max-w-[1040px] grid-cols-4 justify-center gap-px rounded-[20px] bg-[#0B1B2B1A]`}
+      className={`${BORDER_STATS} grid w-full max-w-260 grid-cols-4 justify-center gap-px rounded-[20px] bg-[#0B1B2B1A]`}
     >
       {STATS.map((stat) => (
         <div

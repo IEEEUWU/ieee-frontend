@@ -39,7 +39,7 @@ export function LandingChapters() {
     <section
       id="chapters"
       data-land="chapters"
-      className="flex w-full max-w-[1120px] flex-col items-start gap-12 px-10 pt-[120px]"
+      className="flex w-full max-w-280 flex-col items-start gap-12 px-10 pt-30"
     >
       <SectionHeading
         title="Our chapters & affinity group"

@@ -50,7 +50,7 @@ export function UnitExCom({
             htmlFor="excom-term"
             className={`${LABEL_SM} text-[#8796A5]`}
           >
-            Select Year / Term
+            SELECT YEAR / TERM
           </label>
           <select
             id="excom-term"
@@ -73,7 +73,7 @@ export function UnitExCom({
       {groups.length > 0 ? (
         <UnitPeople groups={groups} brand={brand} />
       ) : (
-        <PendingCard title="Term record pending">
+        <PendingCard title="TERM RECORD PENDING">
           No committee record has been published for this term yet. The
           roster appears here once the branch releases it.
         </PendingCard>

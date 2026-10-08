@@ -61,8 +61,8 @@ export function UnitEvents({
               onClick={() => setView(key)}
               className={`rounded-full px-5 py-2.5 text-[15px] font-medium transition-colors ${
                 view === key
-                  ? "bg-[color:var(--unit-tint)] text-[color:var(--unit-ink)]"
-                  : "text-[#4A5B6B] hover:bg-[color:var(--unit-hover)]"
+                  ? "bg-(--unit-tint) text-(--unit-ink)"
+                  : "text-[#4A5B6B] hover:bg-(--unit-hover)"
               }`}
             >
               {key === "upcoming" ? "Upcoming" : "Past"}
@@ -72,7 +72,7 @@ export function UnitEvents({
         {showCalendar ? (
           <Link
             href="/events"
-            className="text-[15px] font-medium text-[color:var(--unit-ink)] underline-offset-4 hover:underline"
+            className="text-[15px] font-medium text-(--unit-ink) underline-offset-4 hover:underline"
           >
             See the full calendar
           </Link>
@@ -86,12 +86,12 @@ export function UnitEvents({
           ))}
         </div>
       ) : view === "upcoming" ? (
-        <PendingCard title="Session schedule pending">
+        <PendingCard title="SESSION SCHEDULE PENDING">
           No upcoming events are published for {abbreviation} yet. The session
           schedule is listed here once confirmed.
         </PendingCard>
       ) : (
-        <PendingCard title="Event archive pending">
+        <PendingCard title="EVENT ARCHIVE PENDING">
           Past events for {abbreviation} are not archived publicly yet. Records
           are listed here as the branch publishes them.
         </PendingCard>
@@ -102,7 +102,8 @@ export function UnitEvents({
 
 /**
  * The redesigned event card: a 16:10 cover leads, the tag rides the image
- * as a white pill, and the unit's tinted date plate straddles the image's
+ * as a white pill on a themed hairline, and the unit's own white date plate
+ * straddles the image's
  * bottom edge — half on the photograph, half on the card — so the cover and
  * the landing's own date object interlock instead of stacking. Title and
  * copy sit below in the row's exact type. Covers are the branch's CC0 stock
@@ -120,20 +121,20 @@ function EventCard({ event }: { event: EventLike }) {
           width={960}
           height={600}
           sizes="346px"
-          className="aspect-[16/10] w-full object-cover"
+          className="aspect-16/10 w-full object-cover"
         />
-        <div className="absolute right-4 top-4 rounded-full border border-[#0b1b2b1a] bg-white px-[14px] py-2">
-          <p className="whitespace-pre text-[13px] font-medium text-[color:var(--unit-ink)]">
+        <div className="absolute right-4 top-4 rounded-full border border-(--unit-line) bg-white px-3.5 py-2">
+          <p className="whitespace-pre text-[13px] font-medium text-(--unit-ink)">
             {event.tag}
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-4 px-6 pb-6">
-        <div className="relative z-10 -mt-12 flex w-[88px] flex-col items-center gap-0.5 self-start rounded-2xl border border-[color:var(--unit-line)] bg-white py-[14px]">
-          <p className="text-[32px] font-semibold text-[color:var(--unit-ink)]">
+        <div className="relative z-10 -mt-12 flex w-22 flex-col items-center gap-0.5 self-start rounded-2xl border border-(--unit-line) bg-white py-3.5">
+          <p className="text-[32px] font-semibold text-(--unit-ink)">
             {event.day}
           </p>
-          <p className={`${LABEL_XS} text-[color:var(--unit-ink)]`}>
+          <p className={`${LABEL_XS} text-(--unit-ink)`}>
             {event.month}
           </p>
         </div>

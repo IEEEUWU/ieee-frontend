@@ -11,7 +11,7 @@ export function LandingEvents() {
     <section
       id="events"
       data-land="events"
-      className="flex w-full max-w-[1120px] flex-col items-start gap-12 px-10 pb-[120px]"
+      className="flex w-full max-w-280 flex-col items-start gap-12 px-10 pb-30"
     >
       <SectionHeading
         title="Upcoming events"
@@ -23,7 +23,7 @@ export function LandingEvents() {
             key={event.title}
             className={`${RULE_BOTTOM} flex w-full flex-row items-center gap-10 px-2 py-8`}
           >
-            <div className="flex w-[88px] flex-col items-center gap-0.5 rounded-2xl bg-[#00629B14] px-0 py-[14px]">
+            <div className="flex w-22 flex-col items-center gap-0.5 rounded-2xl bg-[#00629B14] px-0 py-3.5">
               <p className="text-[32px] font-semibold text-[#00629B]">
                 {event.day}
               </p>
@@ -41,7 +41,7 @@ export function LandingEvents() {
                 </p>
               </div>
             </div>
-            <div className={`${BORDER_TAG} rounded-full px-[14px] py-2`}>
+            <div className={`${BORDER_TAG} rounded-full px-3.5 py-2`}>
               <p className="whitespace-pre text-[13px] font-medium text-[#00629B]">
                 {event.tag}
               </p>

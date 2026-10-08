@@ -107,7 +107,7 @@ export function ChapterPage({
   return (
     <div
       data-land="unit"
-      className="flex w-full max-w-[1120px] flex-col items-start gap-12 px-10 pb-[120px]"
+      className="flex w-full max-w-280 flex-col items-start gap-12 px-10 pb-30"
       style={
         {
           "--unit-brand": unit.colour.brand,
@@ -119,8 +119,8 @@ export function ChapterPage({
       }
     >
       <Link
-        href="/#societies"
-        className="group inline-flex items-center gap-2 text-[13px] font-medium text-[#8796A5] transition-colors hover:text-[color:var(--unit-ink)]"
+        href="/#chapters"
+        className="group inline-flex items-center gap-2 text-[13px] font-medium text-[#8796A5] transition-colors hover:text-(--unit-ink)"
       >
         <ArrowLeft
           size={14}
@@ -135,12 +135,12 @@ export function ChapterPage({
           identity panel: the lockup on the unit's tint, ghosted monogram */}
       <header className="flex w-full flex-row items-center justify-between gap-16">
         <div className="flex min-w-0 flex-col items-start gap-8">
-          <div className="flex flex-row items-center gap-2 rounded-full bg-[color:var(--unit-tint)] px-4 py-2">
+          <div className="flex flex-row items-center gap-2 rounded-full bg-(--unit-tint) px-4 py-2">
             <div
-              className="h-2 w-2 rounded-full bg-[color:var(--unit-brand)]"
+              className="h-2 w-2 rounded-full bg-(--unit-brand)"
               aria-hidden="true"
             />
-            <p className="whitespace-pre text-[14px] font-medium text-[color:var(--unit-ink)]">
+            <p className="whitespace-pre text-[14px] font-medium text-(--unit-ink)">
               {unit.abbreviation} · {unit.unitTypeLabel} · Chartered under IEEE
               Student Branch
             </p>
@@ -152,7 +152,7 @@ export function ChapterPage({
             </h1>
           </div>
 
-          <div className="w-full max-w-[680px]">
+          <div className="w-full max-w-170">
             <p className="text-[19px] leading-[1.6] text-[#4A5B6B] text-pretty">
               {unit.scope}
             </p>
@@ -161,7 +161,7 @@ export function ChapterPage({
           <div className="flex flex-row items-start gap-3">
             <Link
               href="/#join"
-              className="rounded-full bg-[color:var(--unit-ink)] px-7 py-4 text-[16px] font-semibold text-white"
+              className="rounded-full bg-(--unit-ink) px-7 py-4 text-[16px] font-semibold text-white"
             >
               {unit.unitType === "chapter" ? "Join this chapter" : site.joinLabel}
             </Link>
@@ -174,10 +174,10 @@ export function ChapterPage({
           </div>
         </div>
 
-        <div className="relative flex h-[340px] w-[400px] shrink-0 items-center justify-center overflow-hidden rounded-[32px] border border-[color:var(--unit-line)] bg-[color:var(--unit-tint)]">
+        <div className="relative flex h-85 w-100 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-(--unit-line) bg-(--unit-tint)">
           <span
             aria-hidden="true"
-            className="absolute -bottom-10 -right-3 select-none text-[190px] font-bold leading-none tracking-[-6px] text-[color:var(--unit-brand)] opacity-[0.07]"
+            className="absolute -bottom-10 -right-3 select-none text-[190px] font-bold leading-none tracking-[-6px] text-(--unit-brand) opacity-[0.07]"
           >
             {unit.abbreviation}
           </span>
@@ -191,7 +191,7 @@ export function ChapterPage({
               className="relative max-h-[46%] w-auto max-w-[82%] object-contain"
             />
           ) : (
-            <span className="relative text-[96px] font-semibold tracking-[-3px] text-[color:var(--unit-brand)]">
+            <span className="relative text-[96px] font-semibold tracking-[-3px] text-(--unit-brand)">
               {unit.abbreviation}
             </span>
           )}
@@ -204,9 +204,9 @@ export function ChapterPage({
         title={aboutTitle}
         lede="What this unit is chartered to do, and what it publishes."
       >
-        <div className="grid w-full gap-5 md:grid-cols-2">
-          <InfoCard kicker="Chartered Focus Areas">
-            <ul className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full grid-cols-2 gap-5">
+          <InfoCard kicker="CHARTERED FOCUS AREAS">
+            <ul className="grid grid-cols-2 gap-3">
               {unit.areas.map((area) => (
                 <li
                   key={area}
@@ -216,7 +216,7 @@ export function ChapterPage({
                     size={14}
                     weight="bold"
                     aria-hidden="true"
-                    className="shrink-0 translate-y-0.5 text-[color:var(--unit-brand)]"
+                    className="shrink-0 translate-y-0.5 text-(--unit-brand)"
                   />
                   <span>{area}</span>
                 </li>
@@ -225,26 +225,26 @@ export function ChapterPage({
           </InfoCard>
 
           {publication.length > 0 ? (
-            <InfoCard kicker="Publication Status">
+            <InfoCard kicker="PUBLICATION STATUS">
               <ul className="flex flex-col gap-2.5">
                 {publication.map((item) => (
                   <li
                     key={item}
-                    className="flex items-baseline gap-3 text-[14px] text-[#4A5B6B]"
+                    className="flex items-baseline gap-3 text-[15px] text-[#4A5B6B]"
                   >
                     {demoPublication ? (
                       <Check
                         size={14}
                         weight="bold"
                         aria-hidden="true"
-                        className="shrink-0 translate-y-0.5 text-[color:var(--unit-brand)]"
+                        className="shrink-0 translate-y-0.5 text-(--unit-brand)"
                       />
                     ) : (
                       <Clock
                         size={13}
                         weight="regular"
                         aria-hidden="true"
-                        className="shrink-0 translate-y-0.5 text-[color:var(--unit-brand)]"
+                        className="shrink-0 translate-y-0.5 text-(--unit-brand)"
                       />
                     )}
                     <span>{item}</span>
@@ -255,7 +255,7 @@ export function ChapterPage({
           ) : null}
         </div>
 
-        <InfoCard kicker="Subgroup Portal Deployment Status">
+        <InfoCard kicker="SUBGROUP PORTAL DEPLOYMENT STATUS">
           <p className="max-w-[80ch] text-[15px] leading-[1.6] text-[#4A5B6B]">
             This route serves as the frontend designated landing point for{" "}
             <strong className="font-semibold text-[#0B1B2B]">
@@ -324,16 +324,16 @@ export function ChapterPage({
         title="Contact & Social Links"
         lede="Where to find the branch, and its published channels."
       >
-        <div className="grid w-full gap-5 md:grid-cols-2">
-          <InfoCard kicker="Branch address">
+        <div className="grid w-full grid-cols-2 gap-5">
+          <InfoCard kicker="BRANCH ADDRESS">
             <div className="flex items-start gap-3">
               <MapPin
                 size={16}
                 weight="bold"
                 aria-hidden="true"
-                className="mt-0.5 shrink-0 text-[color:var(--unit-brand)]"
+                className="mt-0.5 shrink-0 text-(--unit-brand)"
               />
-              <address className="text-[15px] leading-[1.7] text-[#4A5B6B] not-italic">
+              <address className="text-[15px] leading-[1.6] text-[#4A5B6B] not-italic">
                 <div>{site.university}</div>
                 <div>
                   {site.city}, {site.country}
@@ -344,18 +344,18 @@ export function ChapterPage({
           </InfoCard>
 
           {email || DEMO_SOCIALS.length > 0 ? (
-            <InfoCard kicker="Official channels">
+            <InfoCard kicker="OFFICIAL CHANNELS">
               <div className="flex flex-col gap-4">
                 {email ? (
                   <a
                     href={`mailto:${email}`}
-                    className="flex items-center gap-3 text-[15px] font-medium text-[#0B1B2B] transition-colors hover:text-[color:var(--unit-ink)]"
+                    className="flex items-center gap-3 text-[15px] font-medium text-[#0B1B2B] transition-colors hover:text-(--unit-ink)"
                   >
                     <Envelope
                       size={16}
                       weight="bold"
                       aria-hidden="true"
-                      className="shrink-0 text-[color:var(--unit-brand)]"
+                      className="shrink-0 text-(--unit-brand)"
                     />
                     {email}
                   </a>
@@ -370,13 +370,13 @@ export function ChapterPage({
                         target="_blank"
                         rel="noreferrer"
                         aria-label={social.label(unit.abbreviation)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--unit-tint)] transition-colors hover:bg-[color:var(--unit-hover)]"
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-(--unit-tint) transition-colors hover:bg-(--unit-hover)"
                       >
                         <Icon
                           size={18}
                           weight="regular"
                           aria-hidden="true"
-                          className="text-[color:var(--unit-brand)]"
+                          className="text-(--unit-brand)"
                         />
                       </a>
                     );
@@ -385,7 +385,7 @@ export function ChapterPage({
               </div>
             </InfoCard>
           ) : (
-            <PendingCard title="Contact channels pending">
+            <PendingCard title="CONTACT CHANNELS PENDING">
               The official email and social accounts for this unit have not
               been published yet.
             </PendingCard>

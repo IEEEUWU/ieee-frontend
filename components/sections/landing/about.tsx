@@ -9,9 +9,9 @@ export function LandingAbout() {
     <section
       id="about"
       data-land="about"
-      className="flex w-full max-w-[1120px] flex-row items-start gap-16 px-10 py-[120px]"
+      className="flex w-full max-w-280 flex-row items-start gap-16 px-10 py-30"
     >
-      <div className="w-[240px]">
+      <div className="w-60">
         <p className={`${LABEL_SM} text-[#00629B]`}>
           ABOUT THE BRANCH
         </p>

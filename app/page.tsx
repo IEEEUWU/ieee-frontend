@@ -74,7 +74,7 @@ export default function Page() {
   return (
     <main
       id="main"
-      className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-[family-name:var(--font-plex)] leading-[1.2] normal-nums"
+      className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-plex leading-[1.2] normal-nums"
     >
       <LandingNav />
       <LandingHero />
@@ -84,7 +84,7 @@ export default function Page() {
       <LandingEvents />
       <LandingCommittee />
       <LandingJoin />
-      <div data-land="spacer" className="h-[120px] w-full" />
+      <div data-land="spacer" className="h-30 w-full" />
       <LandingFooter />
     </main>
   );
