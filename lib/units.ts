@@ -90,11 +90,11 @@ export const societies: readonly Society[] = [
   {
     id: "ias",
     abbreviation: "IAS",
-    name: "Industrial Automation Society",
+    name: "Industry Applications Society",
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/ias",
+    portalUrl: "/ias",
     portalLabel: "IAS Chapter Portal",
     scope:
       "Process control, instrumentation and factory automation. Members work on control loops, plant logic and the measurement systems that run real equipment.",
@@ -114,7 +114,7 @@ export const societies: readonly Society[] = [
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/cs",
+    portalUrl: "/cs",
     portalLabel: "Computer Society Portal",
     scope:
       "Computing practice end to end: languages, systems, networks, data and security. Members build software, run infrastructure and test systems on purpose.",
@@ -130,7 +130,7 @@ export const societies: readonly Society[] = [
     unitType: "chapter",
     unitTypeLabel: "Technical Chapter",
     parentId: "sb",
-    portalUrl: "/chapters/ras",
+    portalUrl: "/ras",
     portalLabel: "RAS Chapter Portal",
     scope:
       "Robotics, mechatronics and control. Members build machines that sense and act, from embedded controllers through to autonomous platforms.",
@@ -146,7 +146,7 @@ export const societies: readonly Society[] = [
     unitType: "affinity_group",
     unitTypeLabel: "Affinity Group",
     parentId: "sb",
-    portalUrl: "/affinity/wie",
+    portalUrl: "/wie",
     portalLabel: "WIE Affinity Portal",
     scope:
       "Advances the participation and progression of women in engineering. Members run outreach, mentoring and STEM programmes for the campus and the surrounding schools under the Student Branch.",

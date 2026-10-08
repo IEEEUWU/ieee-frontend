@@ -76,7 +76,7 @@ export const photos = {
      states this on the page for the same reason.
      ------------------------------------------------------------------- */
 
-  /** Plate for the Industrial Automation Society session. */
+  /** Plate for the Industry Applications Society session. */
   eventPlc: {
     src: "/photos/events/plc-panel.jpg",
     alt: "Duotone blue industrial control panel with switches and indicator lamps",
