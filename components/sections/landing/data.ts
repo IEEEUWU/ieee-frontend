@@ -67,8 +67,60 @@ export const CHAPTERS = [
   },
 ] as const;
 
+/**
+ * Where an event happens.
+ *
+ * The branch publishes all three shapes: `in-person` and `hybrid` events give
+ * the room, `online` events say how to join. Nothing about the venue is
+ * inferred — an event without one never reaches this file.
+ */
+export type EventVenue = {
+  readonly mode: "online" | "in-person" | "hybrid";
+  readonly place: string;
+};
+
+/**
+ * The organisation running the event beside the host chapter: another
+ * chartered chapter inside the hierarchy, or a body outside IEEE. The chapter
+ * case resolves to its portal where one exists, so the credit links home.
+ */
+export type EventCollaboration = {
+  readonly name: string;
+  readonly kind: "chapter" | "external";
+  readonly description: string;
+};
+
+/**
+ * The session's presenter. The photograph is the branch's people placeholder
+ * until a portrait is supplied — never a stranger's face standing in.
+ */
+export type EventSpeaker = {
+  readonly name: string;
+  readonly title: string;
+  readonly photo: string;
+  readonly bio: string;
+};
+
+/** One attendee's words, attributed the way the site attributes people. */
+export type EventFeedback = {
+  readonly quote: string;
+  readonly name: string;
+  readonly role: string;
+};
+
+/**
+ * The published programme: one entry per event that has a preview page at
+ * `/events/[slug]`, addressed by `slug`.
+ *
+ * Each row carries the full record that page renders — identity (title,
+ * description, tag, cover), the facts (date, time, venue), the partners
+ * (collaboration and sponsors), and the content bands (gallery, feedbacks,
+ * speaker). Cards elsewhere in the site read the shared subset through
+ * `EventRecord`, so a richer row never changes their layout.
+ */
 export const EVENTS = [
   {
+    slug: "uwu-hackathon-2026",
     day: "24",
     month: "OCT",
     title: "UWU Hackathon 2026",
@@ -76,8 +128,50 @@ export const EVENTS = [
       "A 24-hour build sprint hosted by the Computer Society: form a team, ship a prototype, pitch to judges.",
     tag: "Computer Society",
     cover: "/photos/events/vision-code.jpg",
+    time: "09:00 · 24 HOURS",
+    venue: {
+      mode: "in-person",
+      place: "Faculty of Applied Sciences",
+    },
+    collaboration: {
+      name: "SLASSCOM",
+      kind: "external",
+      description:
+        "Sri Lanka's ICT industry association, connecting student builders with mentors, showcase opportunities and the wider technology sector.",
+    },
+    sponsors: [
+      "IEEE Sri Lanka Section",
+      "Faculty of Applied Sciences, UWU",
+      "SLASSCOM",
+    ],
+    gallery: [
+      "/photos/events/hack-night.jpg",
+      "/photos/events/vision-code.jpg",
+      "/photos/control-panel.jpg",
+    ],
+    speaker: {
+      name: "Eng. Kasun Perera",
+      title: "Software architect and IEEE volunteer",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Kasun has spent a decade shipping distributed systems and mentoring student teams through their first hackathons. He opens the sprint with a walk-through of scoping a build a team can actually finish in twenty-four hours.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "We arrived with an idea on paper and left with a prototype the judges actually used. The format is intense, but the mentors kept us honest about scope.",
+        name: "Nimasha Perera",
+        role: "Third year, Faculty of Applied Sciences",
+      },
+      {
+        quote:
+          "Forming a team on the spot turned out to be the best part — we shipped with people we had never met before.",
+        name: "Tharindu Bandara",
+        role: "Second year, Faculty of Science and Technology",
+      },
+    ],
   },
   {
+    slug: "roborace-challenge",
     day: "08",
     month: "NOV",
     title: "RoboRace Challenge",
@@ -85,8 +179,49 @@ export const EVENTS = [
       "Design and race autonomous line-following robots in the Robotics and Automation Society's annual competition.",
     tag: "RAS",
     cover: "/photos/events/ros-robot.jpg",
+    time: "13:00 – 17:00",
+    venue: {
+      mode: "in-person",
+      place: "Robotics Laboratory, Badulla",
+    },
+    collaboration: {
+      name: "IEEE Computer Society Student Branch",
+      kind: "chapter",
+      description:
+        "The branch's Computer Society chapter co-runs the vision track: teams get its course-detection pipeline, and its members judge the final runs alongside RAS.",
+    },
+    sponsors: [
+      "IEEE Sri Lanka Section",
+      "Faculty of Science and Technology, UWU",
+    ],
+    gallery: [
+      "/photos/events/ros-robot.jpg",
+      "/photos/events/plc-panel.jpg",
+      "/photos/robotics-arm.jpg",
+    ],
+    speaker: {
+      name: "Dr. Anura Mendis",
+      title: "Embedded systems lecturer and robotics mentor",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Anura has coached student robotics teams for eight years, from first line-followers to national finals. He walks the field through tuning a PID loop the pragmatic way before the gates open.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "The practice lane was the difference — by the time our run counted, the robot had already failed every corner at least once.",
+        name: "Dilshan Fernando",
+        role: "Fourth year, Faculty of Science and Technology",
+      },
+      {
+        quote:
+          "Watching the vision track run live made the Computer Society session finally click. We are joining that chapter next.",
+        name: "Ayesha Rahman",
+        role: "Third year, Faculty of Management Studies",
+      },
+    ],
   },
   {
+    slug: "she-leads-in-tech",
     day: "22",
     month: "NOV",
     title: "She Leads in Tech",
@@ -94,8 +229,102 @@ export const EVENTS = [
       "An evening of talks and mentoring with women engineers from Sri Lanka's leading tech companies.",
     tag: "WIE",
     cover: "/photos/events/cv-clinic.jpg",
+    time: "16:00 – 19:00",
+    venue: {
+      mode: "hybrid",
+      place: "Main Auditorium · livestream",
+    },
+    collaboration: {
+      name: "UWU Career Services Unit",
+      kind: "external",
+      description:
+        "The university's career services unit brings placement advisers and alumni into the room, so the evening ends with concrete next steps rather than stories alone.",
+    },
+    sponsors: ["IEEE Sri Lanka Section", "IEEE WIE Affinity Group, Sri Lanka"],
+    gallery: [
+      "/photos/events/cv-clinic.jpg",
+      "/photos/liquid-crystal.jpg",
+      "/photos/events/hack-night.jpg",
+    ],
+    speaker: {
+      name: "Eng. Sanduni Fernando",
+      title: "Software engineer and IEEE volunteer",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Sanduni works on payments infrastructure and has mentored first-generation students through their first internships. She closes the evening with a candid hour on interviewing, pay conversations and staying in tech.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "Three of us asked about internships on the way out and actually got answers we could use in applications the same night.",
+        name: "Ishara Wickramasinghe",
+        role: "Second year, Faculty of Management Studies",
+      },
+      {
+        quote:
+          "Hearing how people from the same faculties got into the industry made it feel possible rather than aspirational.",
+        name: "Maleesha Gunawardena",
+        role: "Third year, Faculty of Applied Sciences",
+      },
+    ],
   },
 ] as const;
+
+/**
+ * The branch's archive: days that have already run.
+ *
+ * Card-shaped only — no `slug`, because there is no preview page for an event
+ * that is over, so these cards read but never link (the shared card keeps a
+ * slugless record a plain article by construction). The events page shows
+ * them behind its Past tab; a chapter's own demo archive stays in
+ * `unit/demo-data.ts`.
+ */
+export const PAST_EVENTS = [
+  {
+    day: "06",
+    month: "OCT",
+    title: "IEEE Day Celebration",
+    description:
+      "Chapter stands, live demos and a quiz night marking IEEE Day on campus.",
+    tag: "WIE",
+    cover: "/photos/events/hack-night.jpg",
+  },
+  {
+    day: "19",
+    month: "SEP",
+    title: "Vision for Line Followers",
+    description:
+      "A hands-on clinic on camera and sensor choices for competition robots.",
+    tag: "RAS",
+    cover: "/photos/events/vision-code.jpg",
+  },
+  {
+    day: "28",
+    month: "AUG",
+    title: "Résumé & Interview Clinic",
+    description:
+      "Résumé reviews and mock interviews with alumni working in software teams.",
+    tag: "Computer Society",
+    cover: "/photos/events/cv-clinic.jpg",
+  },
+] as const;
+
+/**
+ * One published calendar row, slug included.
+ *
+ * Every section that renders an event takes this shape: the cards on the
+ * homepage's neighbours (`/events`, the preview route's closing grid), the
+ * dated rows on the homepage, the tabbed cards on a chapter page, and the
+ * preview route at `/events/[slug]`, addressed by `slug`. The demo entries in
+ * `unit/demo-data.ts` carry the same fields without one, so a placeholder
+ * event can never be linked to a page that does not exist.
+ *
+ * `registration` is the form URL and stays optional: until the branch
+ * publishes one, the preview page's registration row renders its designed
+ * opens-soon state instead of pointing at a form that does not exist.
+ */
+export type CalendarEvent = (typeof EVENTS)[number] & {
+  readonly registration?: string;
+};
 
 export type Member = {
   name: string;

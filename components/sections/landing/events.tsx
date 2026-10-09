@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EVENTS } from "./data";
 import { SectionHeading } from "./heading";
 import { BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
@@ -5,6 +6,10 @@ import { BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
 /**
  * Dated rows under a split heading. Each row is one grid of three: date
  * plate, title + description, chapter tag, separated by hairline rules.
+ *
+ * The whole row is the link to the event's own preview page, so the calendar
+ * leads somewhere instead of only describing it: the title turns brand blue
+ * on hover, and `:focus-visible` marks the row for keyboard readers.
  */
 export function LandingEvents() {
   return (
@@ -19,9 +24,10 @@ export function LandingEvents() {
       />
       <div className={`${RULE_TOP} flex w-full flex-col gap-0`}>
         {EVENTS.map((event) => (
-          <div
-            key={event.title}
-            className={`${RULE_BOTTOM} flex w-full flex-row items-center gap-10 px-2 py-8`}
+          <Link
+            key={event.slug}
+            href={`/events/${event.slug}`}
+            className={`${RULE_BOTTOM} group flex w-full flex-row items-center gap-10 px-2 py-8`}
           >
             <div className="flex w-22 flex-col items-center gap-0.5 rounded-2xl bg-[#00629B14] px-0 py-3.5">
               <p className="text-[32px] font-semibold text-[#00629B]">
@@ -31,7 +37,7 @@ export function LandingEvents() {
             </div>
             <div className="flex flex-1 flex-col items-start gap-1.5">
               <div className="w-full">
-                <h3 className="text-[24px] font-semibold tracking-[-0.5px] text-[#0B1B2B]">
+                <h3 className="text-[24px] font-semibold tracking-[-0.5px] text-[#0B1B2B] transition-colors group-hover:text-[#00629B]">
                   {event.title}
                 </h3>
               </div>
@@ -46,7 +52,7 @@ export function LandingEvents() {
                 {event.tag}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
