@@ -7,7 +7,6 @@ import { SectionHeading } from "./heading";
 import { BORDER_BTN2, BORDER_CARD, RULE_BOTTOM, RULE_TOP } from "./styles";
 import { EventCard } from "@/components/sections/event-card";
 import { photoBySrc } from "@/lib/photos";
-import { site } from "@/lib/site";
 import { societies } from "@/lib/units";
 
 /** The venue's three published shapes, set for reading. */
@@ -118,16 +117,16 @@ export function LandingEventPreview({
             </p>
             <div className="flex flex-row items-start gap-3 pt-1">
               <Link
-                href="/#join"
+                href={`/events/${event.slug}/register`}
                 className="rounded-full bg-[#00629B] px-7 py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#005282]"
               >
-                {site.joinLabel}
+                Register as Participant
               </Link>
               <Link
-                href="/events"
+                href={`/events/${event.slug}/apply-oc`}
                 className={`${BORDER_BTN2} rounded-full bg-white px-7 py-4 text-[16px] font-semibold text-[#0B1B2B] transition-colors hover:bg-[#EBF2F7]`}
               >
-                See the full calendar
+                Join Organising Committee
               </Link>
             </div>
           </div>
@@ -203,22 +202,19 @@ export function LandingEventPreview({
             <dt className="label-mono w-[170px] shrink-0 text-[#667585]">
               REGISTRATION
             </dt>
-            <dd>
-              {event.registration ? (
-                <a
-                  href={event.registration}
-                  className="inline-flex items-center rounded-full bg-[#00629B] px-5 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#005282]"
-                >
-                  Register now
-                </a>
-              ) : (
-                <span
-                  aria-disabled="true"
-                  className={`${BORDER_BTN2} inline-flex items-center rounded-full bg-white px-5 py-2.5 text-[15px] font-medium text-[#667585]`}
-                >
-                  Registration opens soon
-                </span>
-              )}
+            <dd className="flex flex-wrap items-center gap-3">
+              <Link
+                href={`/events/${event.slug}/register`}
+                className="inline-flex items-center rounded-full bg-[#00629B] px-5 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#005282]"
+              >
+                Register as Participant
+              </Link>
+              <Link
+                href={`/events/${event.slug}/apply-oc`}
+                className={`${BORDER_BTN2} inline-flex items-center rounded-full bg-white px-5 py-2.5 text-[15px] font-semibold text-[#0B1B2B] transition-colors hover:bg-[#EBF2F7]`}
+              >
+                Join Organising Committee
+              </Link>
             </dd>
           </div>
         </dl>

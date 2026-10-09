@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
 import { CHAPTERS } from "./data";
 import { SectionHeading } from "./heading";
@@ -52,53 +53,50 @@ export function LandingChapters() {
         {CHAPTERS.map((chapter) => {
           const tone = chapter.dark ? TONE.dark : TONE.light;
           return (
-            <motion.article
+            <Link
               key={chapter.title}
-              className={`flex h-full w-full flex-col items-start gap-14 rounded-3xl p-8 ${tone.card}`}
-              style={{ boxShadow: "0px 0px 0px 0px rgba(0, 98, 155, 0)" }}
-              whileHover={{
-                boxShadow: "0px 20px 40px 0px rgba(0, 98, 155, 0.12)",
-                scale: 1.1,
-                y: -4,
-              }}
-              transition={hoverSpring}
+              href={chapter.href}
+              className="block h-full w-full rounded-3xl"
             >
-              <div className="flex w-full flex-row items-center justify-between">
-                {/* One identical slot for every chapter: a 224x56 box,
-                    contained and left-aligned, so cards of any logo
-                    proportion hold the same footprint. The box is wider than
-                    the widest lockup at full height (RAS 218px), so CS, IAS
-                    and RAS all reach h-14 while the ultra-wide WIE strip
-                    letterboxes across the slot. On the dark card the ink is
-                    knocked out to white: dark purple on the brand ground
-                    would disappear. */}
-                <Image
-                  src={chapter.logo.src}
-                  alt=""
-                  width={chapter.logo.width}
-                  height={chapter.logo.height}
-                  sizes="224px"
-                  className={
-                    chapter.dark
-                      ? "h-14 w-56 shrink-0 object-contain object-left brightness-0 invert"
-                      : "h-14 w-56 shrink-0 object-contain object-left"
-                  }
-                />
-                <p className={`${LABEL_XS} ${tone.tag}`}>{chapter.tag}</p>
-              </div>
-              <div className="flex w-full flex-col items-start gap-2.5">
-                <h3
-                  className={`w-full text-[26px] font-semibold tracking-[-0.5px] ${tone.title}`}
-                >
-                  {chapter.title}
-                </h3>
-                <p
-                  className={`text-[16px] leading-[1.6] text-pretty ${tone.body}`}
-                >
-                  {chapter.description}
-                </p>
-              </div>
-            </motion.article>
+              <motion.article
+                className={`flex h-full w-full flex-col items-start gap-14 rounded-3xl p-8 ${tone.card}`}
+                style={{ boxShadow: "0px 0px 0px 0px rgba(0, 98, 155, 0)" }}
+                whileHover={{
+                  boxShadow: "0px 20px 40px 0px rgba(0, 98, 155, 0.12)",
+                  scale: 1.03,
+                  y: -4,
+                }}
+                transition={hoverSpring}
+              >
+                <div className="flex w-full flex-row items-center justify-between">
+                  <Image
+                    src={chapter.logo.src}
+                    alt=""
+                    width={chapter.logo.width}
+                    height={chapter.logo.height}
+                    sizes="224px"
+                    className={
+                      chapter.dark
+                        ? "h-14 w-56 shrink-0 object-contain object-left brightness-0 invert"
+                        : "h-14 w-56 shrink-0 object-contain object-left"
+                    }
+                  />
+                  <p className={`${LABEL_XS} ${tone.tag}`}>{chapter.tag}</p>
+                </div>
+                <div className="flex w-full flex-col items-start gap-2.5">
+                  <h3
+                    className={`w-full text-[26px] font-semibold tracking-[-0.5px] ${tone.title}`}
+                  >
+                    {chapter.title}
+                  </h3>
+                  <p
+                    className={`text-[16px] leading-[1.6] text-pretty ${tone.body}`}
+                  >
+                    {chapter.description}
+                  </p>
+                </div>
+              </motion.article>
+            </Link>
           );
         })}
       </div>

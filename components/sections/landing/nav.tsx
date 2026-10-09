@@ -17,14 +17,16 @@ export function LandingNav() {
       data-land="nav"
       className="flex w-full max-w-[1120px] flex-row items-center justify-between px-10 py-6"
     >
-      <Image
-        src="/brand/uwu-sb-logo.png"
-        alt="IEEE Student Branch - Uva Wellassa University"
-        width={235}
-        height={36}
-        priority
-        className="h-9 w-auto"
-      />
+      <Link href="/" aria-label="IEEE Student Branch - Uva Wellassa University Home">
+        <Image
+          src="/brand/uwu-sb-logo.png"
+          alt="IEEE Student Branch - Uva Wellassa University"
+          width={235}
+          height={36}
+          priority
+          className="h-9 w-auto"
+        />
+      </Link>
       <div data-land="nav-links" className="flex flex-row items-center gap-8">
         {NAV_LINKS.map((link) => (
           <p
@@ -34,6 +36,9 @@ export function LandingNav() {
             <Link href={link.href}>{link.label}</Link>
           </p>
         ))}
+        <p className={TEXT_15_MED}>
+          <Link href="/events">All Events</Link>
+        </p>
         <Link
           data-land="nav-join"
           href="/#join"

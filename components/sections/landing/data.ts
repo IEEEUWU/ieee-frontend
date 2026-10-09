@@ -35,6 +35,7 @@ export const STATS = [
 export const CHAPTERS = [
   {
     tag: "CHAPTER 01",
+    href: "/cs",
     logo: { src: "/brand/chapters/uwu-cs.png", width: 936, height: 432 },
     title: "Computer Society",
     description:
@@ -43,6 +44,7 @@ export const CHAPTERS = [
   },
   {
     tag: "CHAPTER 02",
+    href: "/ias",
     logo: { src: "/brand/chapters/uwu-ias.png", width: 2100, height: 618 },
     title: "Industry Applications Society",
     description:
@@ -51,6 +53,7 @@ export const CHAPTERS = [
   },
   {
     tag: "CHAPTER 03",
+    href: "/ras",
     logo: { src: "/brand/chapters/uwu-ras.png", width: 1920, height: 492 },
     title: "Robotics and Automation Society",
     description:
@@ -59,6 +62,7 @@ export const CHAPTERS = [
   },
   {
     tag: "AFFINITY GROUP",
+    href: "/wie",
     logo: { src: "/brand/chapters/uwu-wie.png", width: 920, height: 136 },
     title: "Women in Engineering",
     description:
@@ -264,6 +268,88 @@ export const EVENTS = [
           "Hearing how people from the same faculties got into the industry made it feel possible rather than aspirational.",
         name: "Maleesha Gunawardena",
         role: "Third year, Faculty of Applied Sciences",
+      },
+    ],
+  },
+  {
+    slug: "industrial-automation-symposium-2026",
+    day: "05",
+    month: "DEC",
+    title: "Industrial Automation Symposium 2026",
+    description:
+      "Full-day technical symposium featuring PLC architecture, smart grid integration, and factory automation visits.",
+    tag: "Industry Applications Society",
+    cover: "/photos/events/plc-panel.jpg",
+    time: "09:00 – 16:30",
+    venue: {
+      mode: "in-person",
+      place: "Auditorium Complex, Faculty of Technological Studies",
+    },
+    collaboration: {
+      name: "IEEE IAS Sri Lanka Chapter",
+      kind: "chapter",
+      description:
+        "Joint technical lecture series and factory control architecture demonstrations.",
+    },
+    sponsors: ["IEEE Sri Lanka Section", "IEEE IAS Sri Lanka Chapter"],
+    gallery: [
+      "/photos/events/plc-panel.jpg",
+      "/photos/control-panel.jpg",
+      "/photos/liquid-crystal.jpg",
+    ],
+    speaker: {
+      name: "Dr. P. Jayasena",
+      title: "Senior Lecturer in Mechatronics",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Dr. Jayasena conducts active research in industrial control loops and cyber-physical security.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "The PLC live simulator clinic was invaluable for our course projects.",
+        name: "Gayan Bandara",
+        role: "Fourth year, Faculty of Technological Studies",
+      },
+    ],
+  },
+  {
+    slug: "ieee-uwu-congress-2026",
+    day: "19",
+    month: "DEC",
+    title: "IEEE UWU Congress 2026",
+    description:
+      "The flagship annual congregation of IEEE volunteers at Uva Wellassa University: chapter showcases, keynote addresses, and leadership awards.",
+    tag: "IEEE Student Branch",
+    cover: "/photos/events/hack-night.jpg",
+    time: "08:30 – 18:00",
+    venue: {
+      mode: "in-person",
+      place: "Main University Gymnasium & Convention Hall",
+    },
+    collaboration: {
+      name: "UWU Vice Chancellor's Office",
+      kind: "external",
+      description:
+        "University patron and student volunteer leadership coordination.",
+    },
+    sponsors: ["IEEE Sri Lanka Section", "UWU Vice Chancellor's Office"],
+    gallery: [
+      "/photos/events/hack-night.jpg",
+      "/photos/events/vision-code.jpg",
+      "/photos/robotics-arm.jpg",
+    ],
+    speaker: {
+      name: "Kavindu Dimal",
+      title: "Student Branch Chair 2025/2026",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Opening keynote on university chapter growth and student technical impact across the Uva Province.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "The Congress unites all four chapters under one roof — the best networking day of the year.",
+        name: "Tharindu Wickrama",
+        role: "Third year volunteer",
       },
     ],
   },

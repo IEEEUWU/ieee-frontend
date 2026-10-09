@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RULE_TOP_FAINT, TEXT_15_MED } from "./styles";
 
 /**
@@ -42,7 +43,25 @@ export function LandingFooter({ identity }: { identity?: FooterIdentity }) {
         </div>
         <div>
           <p className={TEXT_15_MED}>
-            Computer Society · IAS · RAS · WIE
+            <Link href="/cs" className="hover:text-[#00629B] hover:underline">
+              Computer Society
+            </Link>
+            {" · "}
+            <Link href="/ias" className="hover:text-[#00629B] hover:underline">
+              IAS
+            </Link>
+            {" · "}
+            <Link href="/ras" className="hover:text-[#00629B] hover:underline">
+              RAS
+            </Link>
+            {" · "}
+            <Link href="/wie" className="hover:text-[#00629B] hover:underline">
+              WIE
+            </Link>
+            {" · "}
+            <Link href="/events" className="hover:text-[#00629B] hover:underline">
+              Events
+            </Link>
           </p>
         </div>
         <div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/ssr";
 import { EVENTS } from "./data";
 import { SectionHeading } from "./heading";
-import { BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
+import { BORDER_BTN2, BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
 
 /**
  * Dated rows under a split heading. Each row is one grid of three: date
@@ -54,6 +55,15 @@ export function LandingEvents() {
             </div>
           </Link>
         ))}
+      </div>
+      <div className="flex w-full items-center justify-between pt-2">
+        <Link
+          href="/events"
+          className={`${BORDER_BTN2} inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-semibold text-[#0B1B2B] transition-colors hover:bg-[#EBF2F7]`}
+        >
+          View all &amp; past events
+          <ArrowRight size={16} weight="bold" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
