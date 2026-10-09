@@ -1,33 +1,25 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  BORDER_CARD,
-  LABEL_XS,
-} from "@/components/sections/landing/styles";
+import { EventCard, type EventRecord } from "@/components/sections/event-card";
 import { PendingCard } from "./section";
 
 /**
- * The shared event fields plus the cover the card is led by, so the same
- * card renders the calendar's published rows and the demo entries alike.
+ * The chapter page's event records are the shared card's records: one shape
+ * for the calendar's published rows and this file's demo entries alike. The
+ * alias keeps the name this page has always exported; the card itself lives
+ * in `components/sections/event-card.tsx`, so every grid in the site renders
+ * the same object.
  */
-export type EventLike = {
-  readonly day: string;
-  readonly month: string;
-  readonly title: string;
-  readonly description: string;
-  readonly tag: string;
-  readonly cover: string;
-};
+export type EventLike = EventRecord;
 
 /**
  * One Events section: the programme and its archive behind a tab pair, so
  * upcoming and past share a heading instead of standing as two sections.
- * Each event gets a card led by its cover — see `EventCard` for how the
- * photograph and the landing's date plate interlock — with every part
- * wearing the unit's theme vars instead of branch blue.
+ * Each event gets the shared card — a 16:10 cover led, the tag riding the
+ * frame, the date plate straddling its bottom edge — wearing the hosting
+ * chapter's own colours, resolved from the event's tag.
  *
  * The tabs are segmented pills in the hero badge's language: the active view
  * sits on the unit's tint with ink text, the resting one on plain copy. An
@@ -97,54 +89,5 @@ export function UnitEvents({
         </PendingCard>
       )}
     </div>
-  );
-}
-
-/**
- * The redesigned event card: a 16:10 cover leads, the tag rides the image
- * as a white pill on a themed hairline, and the unit's own white date plate
- * straddles the image's
- * bottom edge — half on the photograph, half on the card — so the cover and
- * the landing's own date object interlock instead of stacking. Title and
- * copy sit below in the row's exact type. Covers are the branch's CC0 stock
- * (see `lib/photos.ts`), decorative: they claim nothing documentary.
- */
-function EventCard({ event }: { event: EventLike }) {
-  return (
-    <article
-      className={`${BORDER_CARD} flex flex-col overflow-hidden rounded-3xl bg-white`}
-    >
-      <div className="relative">
-        <Image
-          src={event.cover}
-          alt=""
-          width={960}
-          height={600}
-          sizes="346px"
-          className="aspect-16/10 w-full object-cover"
-        />
-        <div className="absolute right-4 top-4 rounded-full border border-(--unit-line) bg-white px-3.5 py-2">
-          <p className="whitespace-pre text-[13px] font-medium text-(--unit-ink)">
-            {event.tag}
-          </p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4 px-6 pb-6">
-        <div className="relative z-10 -mt-12 flex w-22 flex-col items-center gap-0.5 self-start rounded-2xl border border-(--unit-line) bg-white py-3.5">
-          <p className="text-[32px] font-semibold text-(--unit-ink)">
-            {event.day}
-          </p>
-          <p className={`${LABEL_XS} text-(--unit-ink)`}>
-            {event.month}
-          </p>
-        </div>
-        <h3 className="text-[24px] font-semibold tracking-[-0.5px] text-[#0B1B2B]">
-          {event.title}
-        </h3>
-        <p className="text-[16px] leading-[1.6] text-[#4A5B6B]">
-          {event.description}
-        </p>
-      </div>
-    </article>
   );
 }

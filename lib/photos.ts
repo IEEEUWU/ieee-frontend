@@ -135,6 +135,18 @@ export const photos = {
  */
 const frames: readonly Photo[] = Object.values(photos);
 
+/**
+ * Cover lookup by `src`.
+ *
+ * A page that renders one of these frames — the event preview route reads the
+ * recorded alt text and intrinsic size for its plate — finds them here instead
+ * of repeating them beside the path, so the manifest stays the single place a
+ * frame is described.
+ */
+export const photoBySrc: Readonly<Record<string, Photo>> = Object.fromEntries(
+  frames.map((frame) => [frame.src, frame] as const),
+);
+
 export const photoCredits: readonly string[] = frames
   .map((frame) => frame.credit)
   .filter((credit): credit is NonNullable<Photo["credit"]> => Boolean(credit))

@@ -31,6 +31,28 @@ import {
   DEMO_TERMS,
   DEMO_UPCOMING,
 } from "./demo-data";
+import {
+  INITIAL_BOD_TERMS,
+  INITIAL_UNITS,
+  type BodMember,
+} from "@/lib/srs-data";
+import { type Member } from "@/components/sections/landing/data";
+
+function bodToMember(m: BodMember): Member {
+  return {
+    name: m.name,
+    role: m.position,
+    email: m.email,
+  };
+}
+
+function chunkIntoRows<T>(items: T[], size: number): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+  return rows;
+}
 
 /**
  * The shared calendar's tag per society, so a chapter page lists exactly the
@@ -39,7 +61,7 @@ import {
  * unit look busier than it is.
  */
 const EVENT_TAG: Record<SocietyId, string> = {
-  sb: "",
+  sb: "IEEE Student Branch",
   cs: "Computer Society",
   ias: "Industry Applications Society",
   ras: "RAS",
@@ -89,8 +111,72 @@ export function ChapterPage({
 }) {
   const slug = path.split("/").pop() || "sb";
   const calendar = EVENTS.filter((event) => event.tag === EVENT_TAG[unit.id]);
-  const advisors = DEMO_ADVISORS[unit.id];
-  const excom = DEMO_EXCOM[unit.id];
+  const srsUnit = INITIAL_UNITS.find((u) => u.id === unit.id);
+  const srsAdvisors: readonly Member[] =
+    srsUnit?.advisors.map((a) => ({
+      name: a.name,
+      role: a.designation,
+      email: `${a.name.split(" ").pop()?.toLowerCase() ?? "advisor"}@ieeeuwu.org`,
+    })) ?? [];
+  const advisors = srsAdvisors.length > 0 ? srsAdvisors : DEMO_ADVISORS[unit.id];
+
+  const currentBodTerm = INITIAL_BOD_TERMS.find(
+    (t) => t.unitId === unit.id && t.state === "current",
+  );
+  const currentSeniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "senior") ?? [];
+  const currentJuniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "junior") ?? [];
+
+  const currentSeniorGroups =
+    currentSeniorMembers.length > 0
+      ? [
+          {
+            label: "SENIOR EXECUTIVE COMMITTEE",
+            rows: chunkIntoRows(currentSeniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : DEMO_EXCOM[unit.id];
+
+  const currentJuniorGroups =
+    currentJuniorMembers.length > 0
+      ? [
+          {
+            label: "JUNIOR COMMITTEE & ASSOCIATES",
+            rows: chunkIntoRows(currentJuniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : [];
+
+  const pastBodTerms = INITIAL_BOD_TERMS.filter(
+    (t) => t.unitId === unit.id && t.state === "past",
+  );
+  const terms =
+    pastBodTerms.length > 0
+      ? pastBodTerms.map((t) => ({
+          id: t.id,
+          label: t.termLabel,
+          seniorGroups: [
+            {
+              label: "SENIOR EXECUTIVE COMMITTEE",
+              rows: chunkIntoRows(
+                t.members.filter((m) => m.tier === "senior").map(bodToMember),
+                3,
+              ),
+            },
+          ],
+          juniorGroups: [
+            {
+              label: "JUNIOR COMMITTEE & ASSOCIATES",
+              rows: chunkIntoRows(
+                t.members.filter((m) => m.tier === "junior").map(bodToMember),
+                3,
+              ),
+            },
+          ],
+        }))
+      : DEMO_TERMS;
+
   const upcoming: readonly EventLike[] =
     calendar.length > 0 ? calendar : DEMO_UPCOMING[unit.id] ?? [];
   const pastEvents: readonly EventLike[] = DEMO_PAST_EVENTS[unit.id];
@@ -302,11 +388,12 @@ export function ChapterPage({
             Named advisors appear here once confirmed.
           </PendingCard>
         )}
-        {excom.length > 0 ? (
+        {currentSeniorGroups.length > 0 || currentJuniorGroups.length > 0 ? (
           <UnitExCom
-            currentLabel={DEMO_CURRENT_TERM}
-            current={excom}
-            terms={DEMO_TERMS}
+            currentLabel={currentBodTerm?.termLabel ?? DEMO_CURRENT_TERM}
+            currentSenior={currentSeniorGroups}
+            currentJunior={currentJuniorGroups}
+            terms={terms}
             brand={unit.colour.brand}
           />
         ) : (
