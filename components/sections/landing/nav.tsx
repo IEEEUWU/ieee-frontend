@@ -36,9 +36,6 @@ export function LandingNav() {
             <Link href={link.href}>{link.label}</Link>
           </p>
         ))}
-        <p className={TEXT_15_MED}>
-          <Link href="/events">All Events</Link>
-        </p>
         <Link
           data-land="nav-join"
           href="/#join"
