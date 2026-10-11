@@ -6,25 +6,13 @@ import { EventCard, type EventRecord } from "@/components/sections/event-card";
 import { PendingCard } from "./section";
 
 /**
- * The chapter page's event records are the shared card's records: one shape
- * for the calendar's published rows and this file's demo entries alike. The
- * alias keeps the name this page has always exported; the card itself lives
- * in `components/sections/event-card.tsx`, so every grid in the site renders
- * the same object.
+ * The chapter page's event records are the shared card's records.
  */
 export type EventLike = EventRecord;
 
 /**
- * One Events section: the programme and its archive behind a tab pair, so
- * upcoming and past share a heading instead of standing as two sections.
- * Each event gets the shared card — a 16:10 cover led, the tag riding the
- * frame, the date plate straddling its bottom edge — wearing the hosting
- * chapter's own colours, resolved from the event's tag.
- *
- * The tabs are segmented pills in the hero badge's language: the active view
- * sits on the unit's tint with ink text, the resting one on plain copy. An
- * empty view keeps its designed pending card, so a unit with nothing
- * published reads as awaiting rather than broken.
+ * One Events section: the programme and its archive behind a tab pair.
+ * Responsive: 1-col on mobile, 2-col on tablets, 3-col on desktop.
  */
 export function UnitEvents({
   upcoming,
@@ -43,7 +31,7 @@ export function UnitEvents({
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="flex w-full flex-row items-center justify-between gap-4">
+      <div className="flex w-full flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-row items-center gap-1">
           {(["upcoming", "past"] as const).map((key) => (
             <button
@@ -72,7 +60,7 @@ export function UnitEvents({
       </div>
 
       {events.length > 0 ? (
-        <div className="grid w-full grid-cols-3 gap-10">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {events.map((event) => (
             <EventCard key={event.title} event={event} />
           ))}

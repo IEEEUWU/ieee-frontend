@@ -98,7 +98,7 @@ export function LandingCommittee() {
     <section
       id="committee"
       data-land="committee"
-      className="flex w-full max-w-280 flex-col items-center gap-7 px-10 pb-30"
+      className="flex w-full max-w-280 flex-col items-center gap-7 px-4 sm:px-6 md:px-10 pb-16 sm:pb-20 md:pb-30"
       style={
         {
           "--unit-brand": "#00629B",

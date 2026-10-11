@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingFooter } from "@/components/sections/landing/footer";
@@ -14,15 +14,6 @@ interface PageProps {
 
 const SITE_URL = "https://ieee-uwu-student-branch.vercel.app";
 
-/**
- * Same fixed-canvas contract as the homepage, /events and the unit portals:
- * the route draws on the pinned 1200px landing canvas rather than a fluid
- * grid.
- */
-export const viewport: Viewport = {
-  width: 1200,
-  initialScale: undefined,
-};
 
 /** One statically generated route per published calendar row. */
 export async function generateStaticParams() {
@@ -97,7 +88,7 @@ export default async function EventPreviewPage({ params }: PageProps) {
       className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-plex leading-[1.2] normal-nums"
     >
       <LandingNav />
-      <div data-land="spacer" className="h-30 w-full" />
+      <div data-land="spacer" className="h-16 sm:h-24 md:h-30 w-full" />
       <LandingEventPreview
         event={event}
         more={EVENTS.filter((row) => row.slug !== event.slug)}

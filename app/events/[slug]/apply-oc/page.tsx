@@ -159,9 +159,9 @@ export default function EventApplyOcPage({ params }: PageProps) {
   return (
     <main className="landing-page flex min-h-screen w-full flex-col items-center bg-[#F7F9FB] font-sans leading-[1.3] text-[#111111]">
       <LandingNav />
-      <div className="h-28 w-full" />
+      <div className="h-16 sm:h-24 md:h-28 w-full" />
 
-      <div className="flex w-full max-w-[920px] flex-col gap-8 px-6 pb-24">
+      <div className="flex w-full max-w-[920px] flex-col gap-8 px-4 sm:px-6 pb-16 sm:pb-24">
         {/* Navigation link */}
         <Link
           href={`/events/${event.slug}`}
@@ -192,7 +192,7 @@ export default function EventApplyOcPage({ params }: PageProps) {
 
         {submittedApp ? (
           /* OC Application Confirmation Screen */
-          <div className="flex w-full flex-col items-center gap-8 rounded-2xl border border-[#D9D9D9] bg-white p-8 md:p-12">
+          <div className="flex w-full flex-col items-center gap-8 rounded-2xl border border-[#D9D9D9] bg-white p-5 sm:p-8 md:p-12">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#00629B14] text-[#00629B]">
                 <CheckCircle size={36} weight="fill" />
@@ -276,7 +276,7 @@ export default function EventApplyOcPage({ params }: PageProps) {
           </div>
         ) : (
           /* OC Recruitment Application Form */
-          <div className="flex flex-col gap-8 rounded-2xl border border-[#D9D9D9] bg-white p-8 md:p-12">
+          <div className="flex flex-col gap-8 rounded-2xl border border-[#D9D9D9] bg-white p-5 sm:p-8 md:p-12">
             <header className="flex flex-col gap-2 border-b border-[#E2E8F0] pb-6">
               <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00629B]">
                 ORGANIZING COMMITTEE RECRUITMENT

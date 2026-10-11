@@ -59,7 +59,7 @@ export default function AttendeePassPage({ params }: PageProps) {
       <div className="print:hidden w-full">
         <LandingNav />
       </div>
-      <div className="h-24 w-full print:hidden" />
+      <div className="h-16 sm:h-20 md:h-24 w-full print:hidden" />
 
       <div className="flex w-full max-w-[680px] flex-col items-center gap-6 px-4 pb-20">
         {/* Top Controls */}
@@ -84,7 +84,7 @@ export default function AttendeePassPage({ params }: PageProps) {
         {/* Printable Pass Card */}
         <div className="flex w-full flex-col overflow-hidden rounded-3xl border-2 border-[#00629B] bg-white shadow-xs">
           {/* Header Banner */}
-          <div className="flex items-center justify-between bg-[#00629B] px-8 py-5 text-white">
+          <div className="flex items-center justify-between bg-[#00629B] px-5 sm:px-8 py-4 sm:py-5 text-white">
             <div>
               <span className="font-mono text-xs uppercase tracking-widest text-white/80">
                 IEEE UWU STUDENT BRANCH
@@ -97,7 +97,7 @@ export default function AttendeePassPage({ params }: PageProps) {
           </div>
 
           {/* Pass Body */}
-          <div className="flex flex-col gap-8 p-8 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-6 sm:gap-8 p-5 sm:p-8 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4">
               <div>
                 <span className="font-mono text-[11px] uppercase tracking-wider text-[#667585]">
