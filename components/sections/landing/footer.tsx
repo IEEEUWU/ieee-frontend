@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RULE_TOP_FAINT, TEXT_15_MED } from "./styles";
 
 /**
@@ -16,14 +17,8 @@ export type FooterIdentity = {
 };
 
 /**
- * Full-bleed footer: three text columns, then the oversized IEEEUWU
- * wordmark stretched across the viewport.
- *
- * The wordmark is an SVG sized by aspect ratio (74:18). Its text is set
- * with textLength so the glyphs fill the frame exactly, and filled with the
- * source's vertical gradient: solid colour through the lower 40%,
- * fading to near-nothing at the top. A unit page swaps the letters and the
- * gradient colour for its own; the frame, metrics and layout never move.
+ * Full-bleed footer: three columns, oversized wordmark.
+ * Responsive: stacks cleanly on mobile, fluid typography.
  */
 export function LandingFooter({ identity }: { identity?: FooterIdentity }) {
   const accent = identity?.brand ?? "#00629B";
@@ -31,29 +26,47 @@ export function LandingFooter({ identity }: { identity?: FooterIdentity }) {
   return (
     <footer
       data-land="footer"
-      className={`${RULE_TOP_FAINT} flex w-full flex-col items-start gap-10 bg-white px-10 pt-16 pb-0`}
+      className={`${RULE_TOP_FAINT} flex w-full flex-col items-start gap-8 sm:gap-10 bg-white px-4 sm:px-6 md:px-10 pt-10 sm:pt-16 pb-0`}
     >
-      <div className="flex w-full flex-row items-start justify-between">
-        <div className="w-[320px]">
-          <p className="text-[15px] leading-[1.6] text-[#4A5B6B]">
+      <div className="flex w-full flex-col md:flex-row items-start justify-between gap-6 md:gap-8">
+        <div className="w-full md:w-[320px]">
+          <p className="text-[14px] sm:text-[15px] leading-[1.6] text-[#4A5B6B]">
             {identity?.name ?? "IEEE Student Branch"}, Uva Wellassa University,
             Passara Road, Badulla, Sri Lanka
           </p>
         </div>
         <div>
-          <p className={TEXT_15_MED}>
-            Computer Society · IAS · RAS · WIE
-          </p>
+          <div className={`${TEXT_15_MED} flex flex-wrap items-center gap-x-2 gap-y-1`}>
+            <Link href="/cs" className="hover:text-[#00629B] hover:underline">
+              Computer Society
+            </Link>
+            <span aria-hidden="true" className="text-[#8796A5]">·</span>
+            <Link href="/ias" className="hover:text-[#00629B] hover:underline">
+              IAS
+            </Link>
+            <span aria-hidden="true" className="text-[#8796A5]">·</span>
+            <Link href="/ras" className="hover:text-[#00629B] hover:underline">
+              RAS
+            </Link>
+            <span aria-hidden="true" className="text-[#8796A5]">·</span>
+            <Link href="/wie" className="hover:text-[#00629B] hover:underline">
+              WIE
+            </Link>
+            <span aria-hidden="true" className="text-[#8796A5]">·</span>
+            <Link href="/events" className="hover:text-[#00629B] hover:underline">
+              Events
+            </Link>
+          </div>
         </div>
         <div>
-          <p className="whitespace-pre text-[15px] text-[#8796A5]">
+          <p className="text-[14px] sm:text-[15px] text-[#8796A5]">
             © 2026 IEEE UWU
           </p>
         </div>
       </div>
       <svg
         viewBox="0 0 74 18"
-        className="block h-auto w-full"
+        className="block h-auto w-full select-none"
         role="img"
         aria-label={identity?.name ?? "IEEE UWU"}
       >

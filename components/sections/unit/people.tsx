@@ -69,7 +69,7 @@ export function UnitPeople({
               {row.map((member, memberIndex) => (
                 <article
                   key={`${member.role}-${memberIndex}`}
-                  className={`${BORDER_CARD} flex w-60 shrink-0 flex-col items-start gap-4 rounded-3xl bg-white px-3 pb-5 pt-3`}
+                  className={`${BORDER_CARD} flex w-[calc(100%-1rem)] max-w-[260px] sm:w-60 shrink-0 flex-col items-start gap-4 rounded-3xl bg-white px-3 pb-5 pt-3`}
                 >
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
                     <Image

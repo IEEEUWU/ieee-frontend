@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingEventCards } from "@/components/sections/landing/event-cards";
 import { LandingFooter } from "@/components/sections/landing/footer";
@@ -53,13 +53,6 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Same fixed-canvas contract as the homepage; see `app/page.tsx`.
- */
-export const viewport: Viewport = {
-  width: 1200,
-  initialScale: undefined,
-};
 
 export default function Page() {
   return (
@@ -71,7 +64,7 @@ export default function Page() {
       {/* The section carries its own h2; this keeps one h1 per page without
           adding a second visible heading directly above it. */}
       <h1 className="sr-only">Events</h1>
-      <div data-land="spacer" className="h-30 w-full" />
+      <div data-land="spacer" className="h-16 sm:h-24 md:h-30 w-full" />
       <LandingEventCards />
       <LandingFooter />
     </main>

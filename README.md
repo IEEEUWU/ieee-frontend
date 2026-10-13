@@ -4,15 +4,17 @@ The public site for the **IEEE Uva Wellassa Student Branch** (UWU) — five char
 
 Live: **[ieee-uwu-student-branch.vercel.app](https://ieee-uwu-student-branch.vercel.app)**
 
-The site is the branch's discovery hub: what the five societies are, what is running, who is meant to be running it, and how to get involved.
+The site is the branch's discovery hub: what the five societies are, what is running, who is meant to be running it, and how to get involved — across six routes: the homepage, the events calendar, and one portal per chartered society.
 
 ---
 
 ## Status
 
-**Preview.** The page renders in a full state, but two things on it are seeded with **sample records the branch has not supplied**: the dated events register and the committee roster.
+**Preview.** Every route renders in a full state, but records the branch has not supplied are still seeded:
 
-`SAMPLE_DATA` in [`lib/sample.ts`](lib/sample.ts) is `true`, which makes every section holding sample records render a visible "Sample data" notice on the page. A build carrying placeholders cannot be mistaken for a published one. See [Publishing real data](#publishing-real-data).
+- The dated calendar holds only **branch-published events** (`EVENTS` in [`components/sections/landing/data.ts`](components/sections/landing/data.ts)) — three today, shared by the homepage, `/events` and the society portals.
+- The committee roster on the homepage ([`COMMITTEE_GROUPS`](components/sections/landing/data.ts)) and **every roster, archived term and demo event on the society portals** come from placeholder files, clearly marked. The portal demos open with a loud `TEMPORARY` banner in [`components/sections/unit/demo-data.ts`](components/sections/unit/demo-data.ts); nothing in it may ship as fact.
+- Anything without data renders a designed **awaiting-publication** card, never a plausible guess. See [Publishing real data](#publishing-real-data).
 
 ---
 
@@ -54,36 +56,67 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Routes
+
+| Route        | What it is                                                                  |
+| ------------ | --------------------------------------------------------------------------- |
+| `/`          | Homepage — the landing composition (nav, hero, stats, chapters, about, events, committee, join, footer) |
+| `/events`    | The dated programme as a card grid, each card led by its cover              |
+| `/ias` `/cs` `/ras` `/wie` | Society portals — flat top-level URLs, statically generated      |
+
+- All three page types share the same contract as the source design: a **fixed 1200px canvas** (the viewport meta pins the width; sections draw on 1120/1040 gutters).
+- `next.config.ts` permanently redirects the old prefixed URLs — `/chapters/:slug` and `/affinity/:slug` — to the flat route.
+- The sitemap lists `/` and `/events`; the society portals are not submitted yet.
+- The nav's anchors are root-absolute (`/#about`), so they return to the homepage sections from any route.
+
+### Society portal structure
+
+Each portal follows one information architecture, in the landing page's own design language, wearing its society's colour: **hero** (badge, headline, scope, actions, the society's lockup panel) → **about** → **events** (upcoming and past behind one tab pair) → **committee** (advisors, then the Executive Committee with a term selector) → **contact & social links** → a footer customised with the chapter's name and colour.
+
+---
+
 ## Project layout
 
 ```
 app/
-  layout.tsx        Fonts, metadata, JSON-LD, html shell
-  page.tsx          Composition root — a server component, owns section order
-  globals.css       The design system: tokens, base, components, motion utilities
+  layout.tsx        Fonts (Archivo, Plex Sans, Plex Mono), metadata, JSON-LD, html shell
+  page.tsx          Homepage — landing composition, pinned 1200px canvas
+  events/page.tsx   /events — the programme as a card grid
+  [slug]/page.tsx   Society portals — generateStaticParams: ias, cs, ras, wie
+  globals.css       The design system: @theme tokens, base, components, motion utilities
   robots.ts         Crawl rules
-  sitemap.ts        Single-route sitemap
+  sitemap.ts        Sitemap (/ and /events)
   icon.svg          Favicon
 
 components/
-  layout/shell.tsx        Max-width container and the one grid on the page
-  navigation/             Sticky header, mobile drawer, reading progress
-  sections/               One file per page section
-  motion/                 Reveal, CountUp, Magnetic — the motion primitives
-  ui/                     Logo, action buttons, Scroller, SignalTrace
+  sections/
+    landing/        One file per homepage section (nav, hero, stats, chapters,
+                    about, events rows, event-cards, committee, join, footer)
+                    plus the shared parts: heading.tsx (split section heading),
+                    styles.ts (border/label class tokens), data.ts (all homepage
+                    copy + the shared EVENTS calendar), hover.ts (hover spring)
+    unit/           Society portals: chapter.tsx (page shell + section order),
+                    section.tsx (UnitSection, PendingCard), events.tsx (tabbed
+                    events + card), excom.tsx (term selector), people.tsx
+                    (member cards), demo-data.ts (TEMPORARY rosters)
+  layout/shell.tsx
+  navigation/site-header.tsx
+  motion/reveal.tsx
+  sections/footer.tsx
+  ui/primitives.tsx   Legacy from the pre-rebuild design — not mounted by any
+                      route (see Architecture notes)
 
 lib/                      Content and data. No components.
-  site.ts                 Branch identity, nav, promise, ticker, contact state
-  units.ts                The five societies, plus id lookups
-  events.ts               Published events register and undated programmes
-  team.ts                 Committee seats and roster statistics
-  record.ts               Confirmed facts, awaiting facts, derived impact figures
-  photos.ts               Photography manifest with alt text and licences
-  sample.ts               The SAMPLE_DATA switch
+  site.ts                 Branch identity, wordmark, join label, institutional facts
+  units.ts                The five societies: scopes, colours, pending lists, portal URLs
+  photos.ts               Photography manifest with sources, licences and alt text
 
 public/
-  brand/uwu-sb-logo.png   Official branch lockup, delivered unmodified
-  photos/                 Frames, duotoned into IEEE Blue before they render
+  brand/uwu-sb-logo.svg   Official branch lockup (what renders; a PNG copy sits beside it)
+  brand/chapters/*.png    Society lockups (CS, IAS, RAS, WIE)
+  photos/                 Frames and event covers, licensed via lib/photos.ts
+
+next.config.ts            Permanent redirects for the old /chapters and /affinity URLs
 ```
 
 ---
@@ -92,38 +125,34 @@ public/
 
 ### The page is a data problem, not a copy problem
 
-`app/page.tsx` is a server component that renders the whole page as HTML. It holds no state, no hooks, and no branch facts. Every statement the page makes — society scopes, dates, committee remits, institutional facts — comes from `lib/`.
+Pages compose; they do not assert. Society scopes, dates, colours, committee remits and institutional facts come from `lib/` and `components/sections/*/data.ts`. To change what the site says, edit those files. If you find yourself typing a branch fact into a component, that's the bug.
 
-To change what the site says, edit `lib/`. If you find yourself typing a branch fact into a component, that's the bug.
+One rule follows from this: **the calendar is shared.** `EVENTS` is a single array; each record carries a `tag`, and a portal lists exactly the events the homepage already attributes to that society (`EVENT_TAG` in [`chapter.tsx`](components/sections/unit/chapter.tsx)). Nothing is reassigned to make a unit look busier than it is.
 
 ### Client islands are deliberate
 
-Eleven files carry `"use client"`:
+Five mounted files carry `"use client"`:
 
 ```
-components/motion/{count-up,magnetic,reveal}.tsx
-components/navigation/site-header.tsx
-components/sections/{event-gallery,explorer,footer,hero,join,society-rail}.tsx
-components/ui/scroller.tsx
+components/sections/landing/{chapters,committee}.tsx   hover-lift motion
+components/sections/unit/{events,excom,people}.tsx     tabs, term selector, hover motion
 ```
 
-Everything else — including `page.tsx` and the majority of sections — renders on the server. Add `"use client"` only when a file genuinely needs state, effects, or event handlers.
+Everything else — including every `page.tsx` and the footer — renders on the server. Add `"use client"` only when a file genuinely needs state, effects, or event handlers.
 
-### Figures are computed, never typed
+(`navigation/site-header.tsx`, `motion/reveal.tsx` and `sections/footer.tsx` also carry the directive, but they belong to the legacy cluster listed in the layout and are not mounted by any route.)
 
-`impactStats` in [`lib/record.ts`](lib/record.ts) is counted from `societies` and `awaitingFacts` at module scope. There are no hand-written statistics anywhere on the site, so a number can never drift from the record behind it. If you add a society, the counts move on their own.
+### One interaction language
 
-### One motion language
-
-Every animation is defined in `components/motion/` and composed elsewhere. The house easing curve (`EASE`) and the duration scale (`DURATION`) live in `reveal.tsx`. No section hand-rolls a transition, so changing the motion language is a change to one file.
+The hover lift shared by the chapter, committee and member cards is a single spring — `hoverSpring` in [`components/sections/landing/hover.ts`](components/sections/landing/hover.ts). Every animation is gated on `prefers-reduced-motion`, and with reduced motion the resting state **is** the finished composition.
 
 ### The design system is CSS, not JavaScript
 
-Tokens are Tailwind v4 `@theme` declarations at the top of [`app/globals.css`](app/globals.css). Colour, type, and the scroll-snap rule are all defined there, which means no component needs to know any of it exists.
+Tokens are Tailwind v4 `@theme` declarations at the top of [`app/globals.css`](app/globals.css). Shared class constants — the hairline border frames, the tracked label styles — live in [`components/sections/landing/styles.ts`](components/sections/landing/styles.ts) so a size or tracking change stays a single edit. Colours are written out in full in those strings (Tailwind's scanner must see each utility literally) and are never interpolated.
 
-### The only scroll-snap rule is one media-query block
+### Portals are the landing's parts, re-themed
 
-`main.page-stack` marks its direct children as snap points so scrolling settles on a section boundary. It is `proximity`, never `mandatory` — mandatory snap makes a section taller than the viewport unreachable — and it is gated on `prefers-reduced-motion: no-preference`, because snap is a change in scroll behaviour rather than decoration.
+A society portal imports the landing's own heading, border and label tokens; it never defines a second system. Five custom properties set once on the page root (`--unit-brand`, `--unit-ink`, `--unit-tint`, `--unit-line`, `--unit-hover`) theme every section, following the brand/ink split documented in [`lib/units.ts`](lib/units.ts). `LandingFooter` takes an optional `identity` prop — absent, it renders the branch footer byte-identically.
 
 ---
 
@@ -135,29 +164,21 @@ Tokens are Tailwind v4 `@theme` declarations at the top of [`app/globals.css`](a
 
 An invented founding year or officer name is worse than a blank, because a reader cannot tell which one they are looking at.
 
-### Two steps, both in `lib/`
+### Where records go
 
-1. **Replace the sample arrays.**
-   - `publishedEvents` in [`lib/events.ts`](lib/events.ts) — real dated events. Each record requires a `photo`, which points at an entry in `lib/photos.ts`; the field is deliberately non-optional so a record cannot be added half-wired.
-   - `committee` in [`lib/team.ts`](lib/team.ts) — set `holder` to `null` rather than inventing a name. The section already renders an explicit awaiting-nomination state, and each seat's `discipline` stays useful even while vacant.
-2. **Set `SAMPLE_DATA = false`** in [`lib/sample.ts`](lib/sample.ts).
+1. **Dated events** — `EVENTS` in [`components/sections/landing/data.ts`](components/sections/landing/data.ts). Each record needs `day`, `month`, `title`, `description`, `tag` (one of the society names the homepage already uses) and `cover`, which points at an entry in [`lib/photos.ts`](lib/photos.ts). Adding a record lights up the homepage row, the `/events` card and the matching portal's Upcoming tab at once.
+2. **Society facts** — [`lib/units.ts`](lib/units.ts). Keep `pending` entries until the branch resolves them; fill them in as records arrive and the awaiting states retire automatically.
+3. **Committee rosters** — replace the placeholder `COMMITTEE_GROUPS` on the homepage, and the demo advisors / Executive Committee / archived terms in [`components/sections/unit/demo-data.ts`](components/sections/unit/demo-data.ts) on the portals.
 
-That flag is the whole mechanism, and it lives in one file so the decision cannot drift between sections. Flipping it to `false` removes the notices and leaves your data untouched.
+### The demo file is temporary by design
 
-### Facts still outstanding
-
-Already named in the code, so a gap reads as a published state rather than an oversight:
-
-- `awaitingFacts` in [`lib/record.ts`](lib/record.ts) — founding year, officer roster, society marks, contact channel, full Section postal address, annual activity report.
-- `pending` on each society in [`lib/units.ts`](lib/units.ts) — marks, rosters and session schedules.
-
-Fill these in as records arrive from the branch, and the pending states retire automatically. Adding a verified event also retires the events empty state with no other change.
+`demo-data.ts` opens with a `TEMPORARY` banner: its rosters, archived terms and demo events exist only so the portal design can be reviewed complete, and no invented name may ship as fact. Emptying its arrays restores every designed awaiting card with **no markup changes** — each section already keeps `PendingCard` as its fallback.
 
 ### What not to do
 
 - Do not invent an event, a date, a venue, an officer, or a contact address.
-- Do not remove a `pending` or `awaiting` entry to make the page look tidier. An acknowledged gap is a feature of this site.
-- Do not use `SAMPLE_DATA` as a way to ship plausible content.
+- Do not remove a `pending` or awaiting entry to make the page look tidier. An acknowledged gap is a feature of this site.
+- Do not let demo data pass into a published build — the banner is not decoration.
 
 ---
 
@@ -165,22 +186,22 @@ Fill these in as records arrive from the branch, and the pending states retire a
 
 Non-negotiable, and enforced by review:
 
-**Colour.** IEEE Blue `#00629B` is the page's structural colour — rules, links, the join block, focus rings. Everything else is a neutral, a tint of that blue, or a value of it. Tokens live in `globals.css`; there are no off-palette hues.
+**Colour.** IEEE Blue `#00629B` is the site's structural colour — rules, links, the join block, focus rings. Everything else is a neutral, a tint of that blue, or a value of it. Tokens live in `globals.css`; there are no off-palette hues.
 
 Two deliberate exceptions, both carrying meaning rather than decoration:
 
-1. **Society identity colour.** Each chartered IEEE society has an established hue and may use it on its own card edge, active marker and label. Each is split into `brand` (fills) and `ink` (anything read as type), because the true CS orange `#E8730C` is only 3.05:1 on white and fails AA. Every `ink` clears 4.5:1 on both white and the surface tone.
+1. **Society identity colour.** Each chartered IEEE society has an established hue and may use it on its own marks: cards, badges, date plates, labels, footer. Each is split into `brand` (fills) and `ink` (anything read as type), because the true CS orange `#E8730C` is only 3.05:1 on white and fails AA. Every `ink` clears 4.5:1 on white. The values live in [`lib/units.ts`](lib/units.ts); a portal themes itself from them through CSS custom properties, so no class is interpolated per society.
 2. **Photography.** Duotoned into the brand hue, so no frame introduces a colour the palette doesn't already contain.
 
 Pure `#000000` is not used as text. Ink is `#111111`.
 
-**Type.** Archivo carries all prose and display. IBM Plex Mono carries the technical register only — charter codes, dates, register labels, instrument values. Mono is not decoration: wherever the page states a fact a reader might copy or compare, it is set in mono, so "this is data" is legible before the sentence is read. Both are subset to Latin, preloaded, and served from the build via `next/font`.
+**Type.** Three families, loaded once in [`app/layout.tsx`](app/layout.tsx): **IBM Plex Sans** carries every rendered page (the landing design); **IBM Plex Mono** is the technical register — charter codes, dates, tracked labels, wherever the page states a fact a reader might copy or compare; **Archivo** remains the base body token of the original system. All are subset to Latin and served from the build via `next/font`.
 
-**Shape.** Radius `0` everywhere. Elevation is expressed with 1px rules, never with shadows. Spacing is on a 4px grid; section rhythm is 64 / 96 / 128.
+**Shape.** One radius vocabulary: `rounded-full` for pills, buttons and tags; `24px` (`rounded-3xl`) for cards; `16px` (`rounded-2xl`) for the objects inside cards (date plates, photos, selects); `20–28px` for feature panels (stats strip, join block). Resting elevation is a 1px hairline, not a shadow; the only shadow is the landing card's hover lift. Spacing sits on a 4px grid, and sections separate at **120px** — the rhythm the homepage, `/events` and the portals all share.
 
-**The lockup.** `public/brand/uwu-sb-logo.png` (8567 × 1313, transparent RGBA) is rendered unboxed, undistorted, at native proportion — never cropped, rotated, tinted, or squeezed into a container that would change its shape. Where the mark cannot stay legible at the size a layout demands, the layout gives way to the wordmark in `lib/site.ts` instead.
+**The lockup.** The official branch lockup (`public/brand/uwu-sb-logo.svg`, 8567 × 1313) is rendered unboxed, undistorted, at native proportion — never cropped, rotated, tinted, or squeezed into a container that would change its shape. Where the mark cannot stay legible at the size a layout demands, the layout gives way to the wordmark in `lib/site.ts` instead. Society lockups live in `public/brand/chapters/` and follow the same rule.
 
-**Photography.** No images of identifiable people, ever: a stock photograph of a stranger must not imply the person is a member of this branch, and a stock frame of a lab must not imply the branch ran that session. Every frame carries alt text and a licence in [`lib/photos.ts`](lib/photos.ts); CC BY credits render in the footer, CC0 frames carry no credit line.
+**Photography.** No images of identifiable people, ever: a stock photograph of a stranger must not imply the person is a member of this branch, and a stock frame of a lab must not imply the branch ran that session. Every frame carries its source and licence in [`lib/photos.ts`](lib/photos.ts); the events route states on the page that its covers are illustrative.
 
 ---
 
@@ -188,11 +209,11 @@ Pure `#000000` is not used as text. Ink is `#111111`.
 
 The target is **WCAG 2.1 AA**, treated as a requirement rather than a pass at the end.
 
-- Skip link, semantic HTML5 landmarks, and 2px visible focus rings — inverted to white on the blue ground, where a blue ring would vanish
-- Body copy ≥ 4.5:1 and large display ≥ 3:1, including every society ink colour, verified against both white and the surface tone
-- Every animation gated on `prefers-reduced-motion: no-preference`. With reduced motion the resting state **is** the finished composition, so the page loses movement and nothing else
-- Full keyboard support for the explorer tablist (one tab stop for the list, arrows to move, Home/End to jump) and the mobile drawer
-- Horizontal rails are real scrollers with `edge-fade` masks, not drag-only surfaces
+- Semantic HTML5 landmarks (`<main id="main">`, navigation, footer) and 2px visible focus rings (blue on light grounds, inverted where a blue ring would vanish)
+- Body copy ≥ 4.5:1 and large display ≥ 3:1, including every society `ink` colour, verified against white
+- CSS-driven motion is gated on `prefers-reduced-motion` in `globals.css`; the card hover lifts animate transform only, so nothing reflows — and with reduced motion the resting state **is** the finished composition
+- Full keyboard support for the portal's interactive controls: the Upcoming/Past event tabs expose `aria-pressed`, and the committee term selector is a labelled `<label for>` control
+- Photography is decorative (`alt=""`) where the adjacent text already names the subject
 
 If your change touches colour, motion, or focus behaviour, re-check the relevant items before opening a pull request.
 
@@ -209,7 +230,7 @@ npm run build
 npm run start
 ```
 
-> **Changing the domain?** `SITE_URL` appears in four places — `app/layout.tsx`, `app/sitemap.ts`, `app/robots.ts`, and `lib/site.ts`. All four must change together or canonical URLs, the sitemap and social cards will disagree with each other.
+> **Changing the domain?** The absolute URL appears in five files — `app/layout.tsx`, `app/page.tsx`, `app/events/page.tsx`, `app/robots.ts` and `app/sitemap.ts`. All five must change together or canonical URLs, the sitemap and social cards will disagree with each other.
 
 ---
 
@@ -217,9 +238,10 @@ npm run start
 
 - [ ] `npm run lint` passes
 - [ ] `npm run build` passes
-- [ ] Content changes follow [Publishing real data](#publishing-real-data) — real records supplied, `SAMPLE_DATA` flipped if the samples were replaced
+- [ ] Content changes follow [Publishing real data](#publishing-real-data) — real records in the shared calendar, demo data never shipped as fact
 - [ ] Brand-affecting changes follow the design rules above
 - [ ] Accessibility re-checked if colour, motion or focus changed
+- [ ] The homepage and `/events` still render exactly as before unless the change is meant to touch them
 - [ ] No new `"use client"` boundary without a stated reason
 
 Full workflow and commit guidance: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
@@ -235,6 +257,7 @@ Expectations of behaviour: **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**.
 | [CONTRIBUTING.md](CONTRIBUTING.md)         | How to propose a change, and the conventions to follow        |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)   | Behaviour expectations, reporting routes, enforcement        |
 | [AGENTS.md](AGENTS.md)                     | Notes for coding agents working in this repo                |
+| [CLAUDE.md](CLAUDE.md)                     | Pointer to AGENTS.md for Claude-based agents                |
 
 ---
 

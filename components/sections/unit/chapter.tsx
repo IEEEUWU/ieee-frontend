@@ -31,6 +31,28 @@ import {
   DEMO_TERMS,
   DEMO_UPCOMING,
 } from "./demo-data";
+import {
+  INITIAL_BOD_TERMS,
+  INITIAL_UNITS,
+  type BodMember,
+} from "@/lib/srs-data";
+import { type Member } from "@/components/sections/landing/data";
+
+function bodToMember(m: BodMember): Member {
+  return {
+    name: m.name,
+    role: m.position,
+    email: m.email,
+  };
+}
+
+function chunkIntoRows<T>(items: T[], size: number): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+  return rows;
+}
 
 /**
  * The shared calendar's tag per society, so a chapter page lists exactly the
@@ -39,7 +61,7 @@ import {
  * unit look busier than it is.
  */
 const EVENT_TAG: Record<SocietyId, string> = {
-  sb: "",
+  sb: "IEEE Student Branch",
   cs: "Computer Society",
   ias: "Industry Applications Society",
   ras: "RAS",
@@ -89,8 +111,72 @@ export function ChapterPage({
 }) {
   const slug = path.split("/").pop() || "sb";
   const calendar = EVENTS.filter((event) => event.tag === EVENT_TAG[unit.id]);
-  const advisors = DEMO_ADVISORS[unit.id];
-  const excom = DEMO_EXCOM[unit.id];
+  const srsUnit = INITIAL_UNITS.find((u) => u.id === unit.id);
+  const srsAdvisors: readonly Member[] =
+    srsUnit?.advisors.map((a) => ({
+      name: a.name,
+      role: a.designation,
+      email: `${a.name.split(" ").pop()?.toLowerCase() ?? "advisor"}@ieeeuwu.org`,
+    })) ?? [];
+  const advisors = srsAdvisors.length > 0 ? srsAdvisors : DEMO_ADVISORS[unit.id];
+
+  const currentBodTerm = INITIAL_BOD_TERMS.find(
+    (t) => t.unitId === unit.id && t.state === "current",
+  );
+  const currentSeniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "senior") ?? [];
+  const currentJuniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "junior") ?? [];
+
+  const currentSeniorGroups =
+    currentSeniorMembers.length > 0
+      ? [
+          {
+            label: "SENIOR EXECUTIVE COMMITTEE",
+            rows: chunkIntoRows(currentSeniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : DEMO_EXCOM[unit.id];
+
+  const currentJuniorGroups =
+    currentJuniorMembers.length > 0
+      ? [
+          {
+            label: "JUNIOR COMMITTEE & ASSOCIATES",
+            rows: chunkIntoRows(currentJuniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : [];
+
+  const pastBodTerms = INITIAL_BOD_TERMS.filter(
+    (t) => t.unitId === unit.id && t.state === "past",
+  );
+  const terms =
+    pastBodTerms.length > 0
+      ? pastBodTerms.map((t) => ({
+          id: t.id,
+          label: t.termLabel,
+          seniorGroups: [
+            {
+              label: "SENIOR EXECUTIVE COMMITTEE",
+              rows: chunkIntoRows(
+                t.members.filter((m) => m.tier === "senior").map(bodToMember),
+                3,
+              ),
+            },
+          ],
+          juniorGroups: [
+            {
+              label: "JUNIOR COMMITTEE & ASSOCIATES",
+              rows: chunkIntoRows(
+                t.members.filter((m) => m.tier === "junior").map(bodToMember),
+                3,
+              ),
+            },
+          ],
+        }))
+      : DEMO_TERMS;
+
   const upcoming: readonly EventLike[] =
     calendar.length > 0 ? calendar : DEMO_UPCOMING[unit.id] ?? [];
   const pastEvents: readonly EventLike[] = DEMO_PAST_EVENTS[unit.id];
@@ -107,7 +193,7 @@ export function ChapterPage({
   return (
     <div
       data-land="unit"
-      className="flex w-full max-w-280 flex-col items-start gap-12 px-10 pb-30"
+      className="flex w-full max-w-280 flex-col items-start gap-8 sm:gap-12 px-4 sm:px-6 md:px-10 pb-16 sm:pb-20 md:pb-30"
       style={
         {
           "--unit-brand": unit.colour.brand,
@@ -133,51 +219,51 @@ export function ChapterPage({
 
       {/* Hero / Introduction — headline column beside the chapter's own
           identity panel: the lockup on the unit's tint, ghosted monogram */}
-      <header className="flex w-full flex-row items-center justify-between gap-16">
-        <div className="flex min-w-0 flex-col items-start gap-8">
-          <div className="flex flex-row items-center gap-2 rounded-full bg-(--unit-tint) px-4 py-2">
+      <header className="flex w-full flex-col-reverse lg:flex-row items-start lg:items-center justify-between gap-8 lg:gap-16">
+        <div className="flex min-w-0 flex-col items-start gap-6 sm:gap-8">
+          <div className="flex flex-row items-center gap-2 rounded-full bg-(--unit-tint) px-3.5 sm:px-4 py-1.5 sm:py-2">
             <div
-              className="h-2 w-2 rounded-full bg-(--unit-brand)"
+              className="h-2 w-2 shrink-0 rounded-full bg-(--unit-brand)"
               aria-hidden="true"
             />
-            <p className="whitespace-pre text-[14px] font-medium text-(--unit-ink)">
+            <p className="whitespace-normal sm:whitespace-pre text-[12px] sm:text-[14px] font-medium text-(--unit-ink)">
               {unit.abbreviation} · {unit.unitTypeLabel} · Chartered under IEEE
               Student Branch
             </p>
           </div>
 
           <div className="w-full">
-            <h1 className="text-[72px] font-semibold tracking-[-2.5px] leading-[1.05] text-[#0B1B2B]">
+            <h1 className="text-[34px] sm:text-[48px] md:text-[60px] lg:text-[72px] font-semibold tracking-[-1px] sm:tracking-[-1.5px] md:tracking-[-2.5px] leading-[1.08] text-[#0B1B2B]">
               {unit.name}
             </h1>
           </div>
 
           <div className="w-full max-w-170">
-            <p className="text-[19px] leading-[1.6] text-[#4A5B6B] text-pretty">
+            <p className="text-[16px] sm:text-[19px] leading-[1.6] text-[#4A5B6B] text-pretty">
               {unit.scope}
             </p>
           </div>
 
-          <div className="flex flex-row items-start gap-3">
+          <div className="flex w-full sm:w-auto flex-col sm:flex-row items-stretch sm:items-start gap-3">
             <Link
               href="/#join"
-              className="rounded-full bg-(--unit-ink) px-7 py-4 text-[16px] font-semibold text-white"
+              className="rounded-full bg-(--unit-ink) px-7 py-3.5 sm:py-4 text-center text-[15px] sm:text-[16px] font-semibold text-white transition-colors hover:opacity-90"
             >
               {unit.unitType === "chapter" ? "Join this chapter" : site.joinLabel}
             </Link>
             <a
               href="#events"
-              className={`${BORDER_BTN2} rounded-full bg-white px-7 py-4 text-[16px] font-semibold text-[#0B1B2B]`}
+              className={`${BORDER_BTN2} rounded-full bg-white px-7 py-3.5 sm:py-4 text-center text-[15px] sm:text-[16px] font-semibold text-[#0B1B2B] transition-colors hover:bg-[#EBF2F7]`}
             >
               See events
             </a>
           </div>
         </div>
 
-        <div className="relative flex h-85 w-100 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-(--unit-line) bg-(--unit-tint)">
+        <div className="relative flex h-56 sm:h-85 w-full lg:w-100 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-(--unit-line) bg-(--unit-tint)">
           <span
             aria-hidden="true"
-            className="absolute -bottom-10 -right-3 select-none text-[190px] font-bold leading-none tracking-[-6px] text-(--unit-brand) opacity-[0.07]"
+            className="absolute -bottom-10 -right-3 select-none text-[140px] sm:text-[190px] font-bold leading-none tracking-[-6px] text-(--unit-brand) opacity-[0.06] sm:opacity-[0.07]"
           >
             {unit.abbreviation}
           </span>
@@ -187,11 +273,11 @@ export function ChapterPage({
               alt=""
               width={unit.logo.width}
               height={unit.logo.height}
-              sizes="400px"
+              sizes="(max-width: 640px) 260px, 400px"
               className="relative max-h-[46%] w-auto max-w-[82%] object-contain"
             />
           ) : (
-            <span className="relative text-[96px] font-semibold tracking-[-3px] text-(--unit-brand)">
+            <span className="relative text-[64px] sm:text-[96px] font-semibold tracking-[-3px] text-(--unit-brand)">
               {unit.abbreviation}
             </span>
           )}
@@ -204,9 +290,9 @@ export function ChapterPage({
         title={aboutTitle}
         lede="What this unit is chartered to do, and what it publishes."
       >
-        <div className="grid w-full grid-cols-2 gap-5">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-5">
           <InfoCard kicker="CHARTERED FOCUS AREAS">
-            <ul className="grid grid-cols-2 gap-3">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {unit.areas.map((area) => (
                 <li
                   key={area}
@@ -302,11 +388,12 @@ export function ChapterPage({
             Named advisors appear here once confirmed.
           </PendingCard>
         )}
-        {excom.length > 0 ? (
+        {currentSeniorGroups.length > 0 || currentJuniorGroups.length > 0 ? (
           <UnitExCom
-            currentLabel={DEMO_CURRENT_TERM}
-            current={excom}
-            terms={DEMO_TERMS}
+            currentLabel={currentBodTerm?.termLabel ?? DEMO_CURRENT_TERM}
+            currentSenior={currentSeniorGroups}
+            currentJunior={currentJuniorGroups}
+            terms={terms}
             brand={unit.colour.brand}
           />
         ) : (
@@ -324,7 +411,7 @@ export function ChapterPage({
         title="Contact & Social Links"
         lede="Where to find the branch, and its published channels."
       >
-        <div className="grid w-full grid-cols-2 gap-5">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-5">
           <InfoCard kicker="BRANCH ADDRESS">
             <div className="flex items-start gap-3">
               <MapPin
@@ -410,7 +497,7 @@ function InfoCard({
 }) {
   return (
     <div
-      className={`${BORDER_CARD} relative flex w-full flex-col gap-5 rounded-3xl bg-white p-8`}
+      className={`${BORDER_CARD} relative flex w-full flex-col gap-4 sm:gap-5 rounded-3xl bg-white p-6 sm:p-8`}
     >
       <p className={`${LABEL_SM} text-[#8796A5]`}>{kicker}</p>
       {children}

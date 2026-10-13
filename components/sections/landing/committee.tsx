@@ -1,101 +1,128 @@
 "use client";
 
-import Image from "next/image";
-import { Fragment } from "react";
-import { motion } from "motion/react";
-import {
-  COMMITTEE_GROUPS,
-  COMMITTEE_PHOTO,
-  MEMBER_SOCIALS,
-} from "./data";
+import type { CSSProperties } from "react";
+import { type Member } from "./data";
 import { SectionHeading } from "./heading";
-import { BORDER_CARD, LABEL_SM } from "./styles";
-import { hoverSpring } from "./hover";
+import { UnitExCom } from "@/components/sections/unit/excom";
+import { UnitPeople } from "@/components/sections/unit/people";
+import {
+  INITIAL_BOD_TERMS,
+  INITIAL_UNITS,
+  type BodMember,
+} from "@/lib/srs-data";
+
+function bodToMember(m: BodMember): Member {
+  return {
+    name: m.name,
+    role: m.position,
+    email: m.email,
+  };
+}
+
+function chunkIntoRows<T>(items: T[], size: number): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+  return rows;
+}
 
 /**
- * Executive committee 2026.
- *
- * Grouped rows of member cards; leadership stacks one card per row, the team
- * members row is capped at 760px so six cards wrap three-by-three. The only
- * hover here belongs to the four social buttons on each card: the card
- * itself is static.
+ * Executive committee for the IEEE Student Branch (sb):
+ * Renders confirmed branch advisors followed by `UnitExCom` with the active
+ * and archived terms selector and Senior / Junior committee tier switcher.
  */
 export function LandingCommittee() {
+  const sbUnit = INITIAL_UNITS.find((u) => u.id === "sb");
+  const advisors: readonly Member[] =
+    sbUnit?.advisors.map((a) => ({
+      name: a.name,
+      role: a.designation,
+      email: `${a.name.split(" ").pop()?.toLowerCase() ?? "advisor"}@ieeeuwu.org`,
+    })) ?? [];
+
+  const currentBodTerm = INITIAL_BOD_TERMS.find(
+    (t) => t.unitId === "sb" && t.state === "current",
+  );
+  const currentSeniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "senior") ?? [];
+  const currentJuniorMembers =
+    currentBodTerm?.members.filter((m) => m.tier === "junior") ?? [];
+
+  const currentSeniorGroups =
+    currentSeniorMembers.length > 0
+      ? [
+          {
+            label: "SENIOR EXECUTIVE COMMITTEE",
+            rows: chunkIntoRows(currentSeniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : [];
+
+  const currentJuniorGroups =
+    currentJuniorMembers.length > 0
+      ? [
+          {
+            label: "JUNIOR COMMITTEE & ASSOCIATES",
+            rows: chunkIntoRows(currentJuniorMembers.map(bodToMember), 3),
+          },
+        ]
+      : [];
+
+  const pastTerms = INITIAL_BOD_TERMS.filter(
+    (t) => t.unitId === "sb" && t.state === "past",
+  ).map((t) => ({
+    id: t.id,
+    label: t.termLabel,
+    seniorGroups: [
+      {
+        label: "SENIOR EXECUTIVE COMMITTEE",
+        rows: chunkIntoRows(
+          t.members.filter((m) => m.tier === "senior").map(bodToMember),
+          3,
+        ),
+      },
+    ],
+    juniorGroups: [
+      {
+        label: "JUNIOR COMMITTEE & ASSOCIATES",
+        rows: chunkIntoRows(
+          t.members.filter((m) => m.tier === "junior").map(bodToMember),
+          3,
+        ),
+      },
+    ],
+  }));
+
   return (
     <section
       id="committee"
       data-land="committee"
-      className="flex w-full max-w-280 flex-col items-center gap-7 px-10 pb-30"
+      className="flex w-full max-w-280 flex-col items-center gap-7 px-4 sm:px-6 md:px-10 pb-16 sm:pb-20 md:pb-30"
+      style={
+        {
+          "--unit-brand": "#00629B",
+          "--unit-ink": "#00629B",
+          "--unit-tint": "#00629B14",
+          "--unit-line": "#00629B40",
+          "--unit-hover": "#00629B2E",
+        } as CSSProperties
+      }
     >
-      <SectionHeading center title="Executive committee 2026" />
-      {COMMITTEE_GROUPS.map((group) => (
-        <Fragment key={group.label}>
-          <div className="w-full">
-            <p className={`text-center ${LABEL_SM} text-[#8796A5]`}>
-              {group.label}
-            </p>
-          </div>
-          {group.rows.map((row, rowIndex) => (
-            <div
-              key={`${group.label}-${rowIndex}`}
-              className={`flex w-full flex-row flex-wrap items-start justify-center gap-5 ${
-                group.narrow ? "max-w-190" : "max-w-full"
-              }`}
-            >
-              {row.map((member, memberIndex) => (
-                <article
-                  key={`${member.role}-${memberIndex}`}
-                  className={`${BORDER_CARD} flex w-60 shrink-0 flex-col items-start gap-4 rounded-3xl bg-white px-3 pb-5 pt-3`}
-                >
-                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
-                    <Image
-                      src={COMMITTEE_PHOTO}
-                      alt=""
-                      fill
-                      sizes="240px"
-                      className="object-cover object-center"
-                    />
-                  </div>
-                  <div className="flex w-full flex-col items-start gap-1 px-2">
-                    <p className="w-full text-[18px] font-semibold text-[#0B1B2B]">
-                      {member.name}
-                    </p>
-                    <p className="w-full text-[15px] text-[#00629B]">
-                      {member.role}
-                    </p>
-                  </div>
-                  <div className="flex w-full flex-row items-center gap-2 px-2">
-                    {MEMBER_SOCIALS.map((social) => {
-                      const Icon = social.icon;
-                      return (
-                        <motion.a
-                          key={social.name}
-                          href={social.href(member)}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={social.label(member)}
-                          className="flex h-9 w-9 flex-row items-center justify-center rounded-full bg-[rgba(0,98,155,0.08)]"
-                          whileHover={{
-                            backgroundColor: "rgba(0, 98, 155, 0.18)",
-                            scale: 1.1,
-                          }}
-                          transition={hoverSpring}
-                        >
-                          <Icon
-                            size={18}
-                            weight="regular"
-                            className="text-[#00629B]"
-                          />
-                        </motion.a>
-                      );
-                    })}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ))}
-        </Fragment>
-      ))}
+      <SectionHeading center title="Executive committee" />
+      {advisors.length > 0 ? (
+        <UnitPeople
+          groups={[{ label: "BRANCH COUNSELOR & ADVISORS", rows: [advisors] }]}
+          brand="#00629B"
+        />
+      ) : null}
+      <UnitExCom
+        currentLabel={currentBodTerm?.termLabel ?? "2025/2026"}
+        currentSenior={currentSeniorGroups}
+        currentJunior={currentJuniorGroups}
+        terms={pastTerms}
+        brand="#00629B"
+      />
     </section>
   );
 }

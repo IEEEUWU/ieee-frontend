@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingFooter } from "@/components/sections/landing/footer";
@@ -10,15 +10,6 @@ interface PageProps {
     slug: string;
   }>;
 }
-
-/**
- * Same fixed-canvas contract as the homepage and /events: the route draws on
- * the pinned 1200px landing canvas rather than a fluid grid.
- */
-export const viewport: Viewport = {
-  width: 1200,
-  initialScale: undefined,
-};
 
 export async function generateStaticParams() {
   return [{ slug: "ias" }, { slug: "cs" }, { slug: "ras" }, { slug: "wie" }];
@@ -63,7 +54,7 @@ export default async function UnitPortalPage({ params }: PageProps) {
       className="landing-page flex min-h-screen w-full flex-col items-center overflow-clip bg-[#F7F9FB] font-[family-name:var(--font-plex)] leading-[1.2] normal-nums"
     >
       <LandingNav />
-      <div data-land="spacer" className="h-[120px] w-full" />
+      <div data-land="spacer" className="h-16 sm:h-24 md:h-30 w-full" />
       <ChapterPage unit={unit} path={`/${slug}`} />
       <LandingFooter
         identity={{

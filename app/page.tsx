@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingHero } from "@/components/sections/landing/hero";
 import { LandingStats } from "@/components/sections/landing/stats";
@@ -61,14 +61,6 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * The design targets a 1200px viewport; `initialScale` is dropped so the
- * default `initial-scale=1` is not emitted alongside the pinned width.
- */
-export const viewport: Viewport = {
-  width: 1200,
-  initialScale: undefined,
-};
 
 export default function Page() {
   return (
@@ -84,7 +76,7 @@ export default function Page() {
       <LandingEvents />
       <LandingCommittee />
       <LandingJoin />
-      <div data-land="spacer" className="h-30 w-full" />
+      <div data-land="spacer" className="h-16 sm:h-24 md:h-30 w-full" />
       <LandingFooter />
     </main>
   );

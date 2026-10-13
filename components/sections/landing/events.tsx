@@ -1,17 +1,18 @@
+import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/ssr";
 import { EVENTS } from "./data";
 import { SectionHeading } from "./heading";
-import { BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
+import { BORDER_BTN2, BORDER_TAG, LABEL_XS, RULE_BOTTOM, RULE_TOP } from "./styles";
 
 /**
- * Dated rows under a split heading. Each row is one grid of three: date
- * plate, title + description, chapter tag, separated by hairline rules.
+ * Dated rows under a split heading. Responsive: collapses nicely on mobile screens.
  */
 export function LandingEvents() {
   return (
     <section
       id="events"
       data-land="events"
-      className="flex w-full max-w-280 flex-col items-start gap-12 px-10 pb-30"
+      className="flex w-full max-w-280 flex-col items-start gap-8 sm:gap-12 px-4 sm:px-6 md:px-10 pb-16 sm:pb-20 md:pb-30"
     >
       <SectionHeading
         title="Upcoming events"
@@ -19,35 +20,45 @@ export function LandingEvents() {
       />
       <div className={`${RULE_TOP} flex w-full flex-col gap-0`}>
         {EVENTS.map((event) => (
-          <div
-            key={event.title}
-            className={`${RULE_BOTTOM} flex w-full flex-row items-center gap-10 px-2 py-8`}
+          <Link
+            key={event.slug}
+            href={`/events/${event.slug}`}
+            className={`${RULE_BOTTOM} group flex w-full flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 md:gap-10 px-2 py-6 sm:py-8 transition-colors`}
           >
-            <div className="flex w-22 flex-col items-center gap-0.5 rounded-2xl bg-[#00629B14] px-0 py-3.5">
-              <p className="text-[32px] font-semibold text-[#00629B]">
+            <div className="flex w-auto sm:w-22 shrink-0 flex-row sm:flex-col items-center gap-2 sm:gap-0.5 rounded-2xl bg-[#00629B14] px-3.5 sm:px-0 py-1.5 sm:py-3.5">
+              <p className="text-[24px] sm:text-[32px] font-semibold text-[#00629B]">
                 {event.day}
               </p>
               <p className={`${LABEL_XS} text-[#00629B]`}>{event.month}</p>
             </div>
             <div className="flex flex-1 flex-col items-start gap-1.5">
               <div className="w-full">
-                <h3 className="text-[24px] font-semibold tracking-[-0.5px] text-[#0B1B2B]">
+                <h3 className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.5px] text-[#0B1B2B] transition-colors group-hover:text-[#00629B]">
                   {event.title}
                 </h3>
               </div>
               <div>
-                <p className="text-[16px] leading-[1.6] text-[#4A5B6B]">
+                <p className="text-[15px] sm:text-[16px] leading-[1.6] text-[#4A5B6B]">
                   {event.description}
                 </p>
               </div>
             </div>
-            <div className={`${BORDER_TAG} rounded-full px-3.5 py-2`}>
-              <p className="whitespace-pre text-[13px] font-medium text-[#00629B]">
+            <div className={`${BORDER_TAG} shrink-0 self-start sm:self-center rounded-full px-3.5 py-1.5 sm:py-2`}>
+              <p className="whitespace-nowrap text-[12px] sm:text-[13px] font-medium text-[#00629B]">
                 {event.tag}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
+      </div>
+      <div className="flex w-full items-center justify-between pt-2">
+        <Link
+          href="/events"
+          className={`${BORDER_BTN2} inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-semibold text-[#0B1B2B] transition-colors hover:bg-[#EBF2F7]`}
+        >
+          View all &amp; past events
+          <ArrowRight size={16} weight="bold" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );

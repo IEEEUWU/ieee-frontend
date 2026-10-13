@@ -1,15 +1,11 @@
 /**
  * Section headings.
- *
- * The source pairs a fixed 560px title column with a 360px lede on a
- * space-between row: chapters and events use that form verbatim. The
- * committee drops the lede and centres the title instead. Both wear the
- * one 48px display style, defined here once.
+ * Responsive: stacked on mobile, split row on desktop. Fluid display sizes.
  */
 
 const TITLE =
-  "text-[48px] font-semibold tracking-[-1.5px] leading-[1.1] text-[#0B1B2B]";
-const LEDE = "text-[17px] leading-[1.6] text-[#4A5B6B]";
+  "text-[28px] sm:text-[36px] md:text-[48px] font-semibold tracking-[-0.7px] sm:tracking-[-1.2px] md:tracking-[-1.5px] leading-[1.15] text-[#0B1B2B]";
+const LEDE = "text-[15px] sm:text-[17px] leading-[1.6] text-[#4A5B6B]";
 
 export function SectionHeading({
   title,
@@ -24,20 +20,22 @@ export function SectionHeading({
 }) {
   if (center) {
     return (
-      <div className="w-full">
+      <div className="w-full px-2">
         <h2 className={`text-center ${TITLE}`}>{title}</h2>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full flex-row items-end justify-between">
-      <div className="w-[560px]">
+    <div className="flex w-full flex-col md:flex-row md:items-end justify-between gap-3 md:gap-8">
+      <div className="w-full md:w-[560px]">
         <h2 className={TITLE}>{title}</h2>
       </div>
-      <div className="w-[360px]">
-        <p className={LEDE}>{lede}</p>
-      </div>
+      {lede ? (
+        <div className="w-full md:w-[360px]">
+          <p className={LEDE}>{lede}</p>
+        </div>
+      ) : null}
     </div>
   );
 }
