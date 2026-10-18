@@ -16,7 +16,7 @@ export async function currentUserResponse() {
       const detailData = await details.json();
       if (!details.ok) return details.status === 401 ? clearSession(backendError(detailData, details.status)) : backendError(detailData, details.status);
       if (detailData.id !== identity.id || !Array.isArray(detailData.effective_permissions)) return json({ error: "Unable to resolve your account permissions." }, 502);
-      data = { ...data, effective_permissions: detailData.effective_permissions };
+      data = { ...data, effective_permissions: detailData.effective_permissions, user_group: detailData.user_group ?? data.user_group };
     }
     return json(parseAuthUser(data));
   } catch { return json({ error: "Unable to load your account. Please try again." }, 502); }

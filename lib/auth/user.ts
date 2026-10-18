@@ -8,6 +8,7 @@ export type AuthUser = {
   email: string;
   chapter: Chapter;
   user_group_id: number;
+  user_group_name?: string | null;
   status: string;
   role: DashboardRole | null;
   effective_permissions: string[];
@@ -34,6 +35,7 @@ export function parseAuthUser(data: unknown): AuthUser | null {
     enrollment_number: value.enrollment_number, email: value.email,
     chapter: value.chapter as Chapter, user_group_id: value.user_group_id,
     status: value.status, role: resolveDashboardRole(value.user_group_id),
+    user_group_name: value.user_group && typeof value.user_group === "object" && "group_name" in value.user_group && typeof value.user_group.group_name === "string" ? value.user_group.group_name : null,
     effective_permissions: Array.isArray(value.effective_permissions) ? [...new Set(value.effective_permissions.filter((code): code is string => typeof code === "string").map((code) => code.trim().toUpperCase()).filter(Boolean))] : [],
   };
 }

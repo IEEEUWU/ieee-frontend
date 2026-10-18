@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingEventCards } from "@/components/sections/landing/event-cards";
 import { LandingFooter } from "@/components/sections/landing/footer";
@@ -61,7 +63,8 @@ export const viewport: Viewport = {
   initialScale: undefined,
 };
 
-export default function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const filters = await searchParams;
   return (
     <main
       id="main"
@@ -72,7 +75,14 @@ export default function Page() {
           adding a second visible heading directly above it. */}
       <h1 className="sr-only">Events</h1>
       <div data-land="spacer" className="h-30 w-full" />
-      <LandingEventCards />
+      <div className="w-full max-w-[1120px] px-10 pb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[#667585] transition-colors hover:text-[#00629B]">
+          <span aria-hidden="true">←</span> Back to home
+        </Link>
+      </div>
+      <Suspense key={JSON.stringify(filters)} fallback={<p role="status" className="animate-pulse p-10 text-lg text-[#00629B]">Loading events…</p>}>
+        <LandingEventCards searchParams={filters} />
+      </Suspense>
       <LandingFooter />
     </main>
   );

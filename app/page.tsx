@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { LandingNav } from "@/components/sections/landing/nav";
 import { LandingHero } from "@/components/sections/landing/hero";
 import { LandingStats } from "@/components/sections/landing/stats";
 import { LandingChapters } from "@/components/sections/landing/chapters";
 import { LandingAbout } from "@/components/sections/landing/about";
-import { LandingEvents } from "@/components/sections/landing/events";
+import { LandingEvents, LandingEventsLoading } from "@/components/sections/landing/events";
 import { LandingCommittee } from "@/components/sections/landing/committee";
 import { LandingJoin } from "@/components/sections/landing/join";
 import { LandingFooter } from "@/components/sections/landing/footer";
@@ -81,7 +82,9 @@ export default function Page() {
       <LandingStats />
       <LandingChapters />
       <LandingAbout />
-      <LandingEvents />
+      <Suspense fallback={<LandingEventsLoading />}>
+        <LandingEvents />
+      </Suspense>
       <LandingCommittee />
       <LandingJoin />
       <div data-land="spacer" className="h-30 w-full" />

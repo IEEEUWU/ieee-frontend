@@ -41,6 +41,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <p className="mt-3 text-lg font-semibold">{user.chapter}</p><p className="mt-1 text-sm leading-relaxed text-[#4A5B6B]">{CHAPTER_NAMES[user.chapter]}</p>
         <nav aria-label="Dashboard navigation" className="mt-6 flex flex-wrap gap-2 lg:flex-col">
           <Link href="/admin" aria-current={pathname === "/admin" ? "page" : undefined} className={`rounded-xl px-4 py-3 text-sm font-medium ${pathname === "/admin" ? "bg-[#00629B] text-white" : "text-[#4A5B6B] hover:bg-[#F7F9FB]"}`}>Overview</Link>
+          <Link href="/admin/events" aria-current={pathname.startsWith("/admin/events") ? "page" : undefined} className={`rounded-xl px-4 py-3 text-sm font-medium ${pathname.startsWith("/admin/events") ? "bg-[#00629B] text-white" : "text-[#4A5B6B] hover:bg-[#F7F9FB]"}`}>Events</Link>
           {canManagePermissions(user) && <Link href="/admin/permissions" aria-current={pathname === "/admin/permissions" ? "page" : undefined} className={`rounded-xl px-4 py-3 text-sm font-medium ${pathname === "/admin/permissions" ? "bg-[#00629B] text-white" : "text-[#4A5B6B] hover:bg-[#F7F9FB]"}`}>Permission management</Link>}
           {canManageUserGroups(user) && <Link href="/admin/usergroups" aria-current={pathname === "/admin/usergroups" ? "page" : undefined} className={`rounded-xl px-4 py-3 text-sm font-medium ${pathname === "/admin/usergroups" ? "bg-[#00629B] text-white" : "text-[#4A5B6B] hover:bg-[#F7F9FB]"}`}>User groups</Link>}
         </nav>

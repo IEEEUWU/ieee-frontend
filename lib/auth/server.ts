@@ -84,7 +84,7 @@ export async function protectedBackendRequest(path: string, init?: Omit<AxiosReq
     url: `${base}${path}`,
     method: init?.method ?? "GET",
     headers,
-    timeout: 15000,
+    timeout: init?.data instanceof FormData ? 60000 : 15000,
     maxRedirects: 0,
     validateStatus: () => true,
   });

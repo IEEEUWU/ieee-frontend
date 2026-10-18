@@ -51,7 +51,7 @@ export async function protectedFetch(input: string, init?: RequestInit) {
     data: init?.body,
     signal: init?.signal ?? undefined,
     withCredentials: true,
-    timeout: 20000,
+    timeout: init?.body instanceof FormData ? 60000 : 20000,
     validateStatus: () => true,
   });
   const response = new Response(upstream.status === 204 ? null : JSON.stringify(upstream.data), { status: upstream.status, headers: { "Content-Type": "application/json" } });

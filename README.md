@@ -292,3 +292,38 @@ Create uses POST `/create-permission`; update uses PUT `/update-permission/{id}`
 Create sends numeric permission IDs to POST `/create-usergroup`. Edit sends numeric permission IDs to PUT `/update-usergroup/{id}`. The separate assignment action sends `{ user_group_id, permissions: number[] }` to POST `/assign-usergroup-permissions`. List uses GET `/get-usergroups?page={page}`, and delete uses DELETE `/delete-usergroup/{id}`. The local routes use the existing configured backend base URL and server-held bearer token.
 
 The list accepts a plain group array or the same paginator envelope as the permission service. Group records use `id`, `group_name`, `group_description`, and optional `permissions` containing IDs, codes, or permission relation objects. Missing or unavailable assignments require an explicit replacement selection before saving, so an omitted relationship cannot silently clear existing permissions. Successful changes refresh the authenticated profile and current list.
+
+## Public event integration
+
+`/events` and `/events/[slug]` load published events from the backend using the existing server-only `AUTH_API_BASE_URL` environment variable (including the backend `/api` prefix). There is no fallback backend host. Requests are GET-only, use `Accept: application/json`, send no bearer token or request body, and are not cached.
+
+The list supports chapter, search, timeframe (`upcoming`, `ongoing`, `past`, `all`), page and per_page (maximum 48). Filter changes reset pagination; page links preserve filters. Invalid queries show a reset action. Event timestamps display in Asia/Colombo. Backend-relative cover paths resolve against the configured backend origin; missing or unsafe covers use a local illustrative image. External images render without the Next.js image proxy.
+
+Detail pages use live metadata and show only fields supplied by the event API. Registration and OC availability are informational for now; their existing demo submission screens have not been connected to the backend. The homepage Upcoming events section also uses the backend; chapter demo calendars remain separate. The sitemap indexes `/events` instead of advertising obsolete demo event slugs.
+
+Run `npm test` for authentication/access and public-event tests. Event tests cover environment configuration, GET payloads, filters, pagination, response validation, safe covers, timezone conversion, error handling and server-rendered list output. Tests mock API responses and do not mutate backend records.
+
+## Admin event creation
+
+Open **Admin > Events > Create event** (`/admin/events`). This screen now uses backend GET `/events` instead of local-storage demo records, including drafts and other statuses within the backend chapter scope. Creation sends metadata as JSON or metadata plus a cover file as multipart to POST `/events` via the local `/api/events` route. The existing `AUTH_API_BASE_URL` and server-held bearer cookie are reused; the browser never receives the backend token.
+
+The form validates required fields, enum values, contact email, string lengths, capacity, image paths, date validity and start/end ordering. Sri Lanka datetime inputs convert explicitly to UTC. Backend field errors remain attached to their fields, and submission values survive errors. Only users with `CREATE_EVENT` see creation controls, and the server rechecks that permission. SB WebMaster chapter selection uses the actual group name from authenticated user details, not a seeded group ID; the backend remains responsible for chapter authorization.
+
+Choose **Published** to display the event publicly; **Draft** appears only in admin Events. The public default is Upcoming, so past/ongoing events require their corresponding public filter. Creation does not create registration/OC forms. Event metadata and covers can be edited using Edit event. Publication changes after creation and form building remain separate follow-up work.
+
+`tests/admin-events.test.cjs` covers payload validation, UTC conversion, create/list proxy behavior, authorization, bearer headers, environment URL configuration, backend field errors and draft catalogue parsing. Tests use mocked create requests and do not create backend records.
+
+## Event cover images and editing
+
+Create/Edit event supports one optional JPEG, PNG or WebP cover up to 5 MiB and 6000 x 6000 pixels. Selection shows a local preview; cancel replacement restores the existing cover, and explicit removal shows the placeholder until saved. Preview object URLs are released when replaced/unmounted. Validation/network errors preserve the file and metadata. Duplicate saves are disabled; mutations are not automatically retried.
+
+Uploads use `cover_image_file`. New clients omit legacy `cover_image` and all response-only fields. File creation uses multipart POST `/events`; file updates use multipart POST `/events/{id}` with `_method=PUT`. Boolean fields are serialized as `1`/`0`, nullable scalars as empty strings, and multipart Content-Type/boundaries are generated by the HTTP client. No base64 or separate upload endpoint is used. JSON metadata updates use PUT `/events/{id}`; removing a cover sends `remove_cover_image: true`. Omitted image fields preserve the current cover. Date edits send both timestamps; status is excluded from metadata updates. Upload requests have a 60-second timeout.
+
+The local `/api/events/[id]` handlers support authenticated detail reads and updates, check UPDATE_EVENT for mutations, and forward backend chapter restrictions and validation errors. All upstream URLs still come from AUTH_API_BASE_URL. Admin/public images and metadata use returned cover_image_url without prepending /api; broken images fall back once to the local placeholder. Backend content/dimension validation and public storage hosting remain authoritative.
+
+Automated tests include a local HTTP multipart transport check verifying generated boundaries, server bearer authorization, method override and unchanged binary bytes. No test uploads files to the configured real backend.
+
+
+## Landing upcoming events
+
+The homepage Upcoming events section loads the next three published upcoming events through the same server-side environment-configured public API helper as /events. It retains the existing dated rows, section heading, dividers, typography and chapter tags. A 96 x 64 cover thumbnail sits between each date and title, hidden below the md breakpoint, using cover_image_url with the shared fallback. A See all events button below the rows always links to /events?timeframe=all. Loading streams inside the section; an API failure shows a local unavailable state while the rest of the homepage remains available. No demo records are substituted for missing backend events.

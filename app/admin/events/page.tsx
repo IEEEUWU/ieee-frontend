@@ -1,345 +1,139 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import {
-  CheckCircle,
-  ToggleLeft,
-  ToggleRight,
-  UsersThree,
-  QrCode,
-  ArrowSquareOut,
-} from "@phosphor-icons/react";
-import { AdminShell, useAdminUser } from "@/components/admin/admin-shell";
-import {
-  getStoredEvents,
-  updateEvent,
-  hasPermission,
-  type SrsEvent,
-} from "@/lib/srs-data";
+import { toast } from "sonner";
+import { EventCoverPicker } from "@/components/admin/event-cover-picker";
+import { EventImage } from "@/components/sections/event-image";
+import type { EventImageSelection } from "@/lib/events/cover";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { useAppSelector } from "@/lib/auth/store";
+import { hasPermission } from "@/lib/permissions/shared";
+import { CHAPTERS, eventDate } from "@/lib/events/shared";
+import { EVENT_MODES, EVENT_STATUSES, EventValidationError, colomboInputToUTC, colomboDateInput, validateCreateEvent, validateUpdateEvent, parseAdminEvent, type AdminEvent, type CreateEvent } from "@/lib/events/admin-shared";
+import { AdminEventRequestError, adminEventRequest, saveAdminEvent, loadAdminEvents } from "@/lib/events/admin-client";
+
+const field = "w-full rounded-xl border border-[#0B1B2B26] bg-[#F7F9FB] px-4 py-3 text-sm focus:border-[#00629B] disabled:opacity-60";
+const button = "rounded-full border border-[#0B1B2B26] px-4 py-2.5 text-sm font-medium hover:bg-[#F7F9FB] disabled:opacity-50";
+const primary = "rounded-full bg-[#00629B] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#005282] disabled:opacity-50";
+
+type Catalogue = Awaited<ReturnType<typeof loadAdminEvents>>;
+function EventDialog({ chapter, canChooseChapter, existing, onClose, onCreated }: { chapter: string; canChooseChapter: boolean; existing?: AdminEvent; onClose: () => void; onCreated: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [pending, setPending] = useState(false);
+  const saving = useRef(false);
+  const [image, setImage] = useState<EventImageSelection>({ file: null, remove: false });
+  const [checkingImage, setCheckingImage] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState("");
+  useEffect(() => { const element = dialog.current; element?.showModal(); return () => element?.close(); }, []);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (saving.current || checkingImage) return;
+    const form = new FormData(event.currentTarget);
+    const value = (name: string) => String(form.get(name) ?? "").trim();
+    let body: CreateEvent | Record<string, unknown>;
+    try {
+      const fields = { title: value("title"), chapter: canChooseChapter ? value("chapter") : chapter,
+        description: value("description") || null,
+        start_date: colomboInputToUTC(value("start_date")), end_date: colomboInputToUTC(value("end_date")),
+        mode: value("mode"), venue: value("venue") || null, contact_email: value("contact_email") || null,
+        contact_phone: value("contact_phone") || null, status: value("status"),
+        max_participants: value("max_participants") ? Number(value("max_participants")) : null,
+        is_registration_open: form.has("is_registration_open"), is_oc_open: form.has("is_oc_open"),
+      };
+      if (existing) { const { status: _status, ...metadata } = fields; void _status; body = validateUpdateEvent(metadata); }
+      else body = validateCreateEvent(fields);
+    } catch (failure) {
+      if (failure instanceof EventValidationError) { setErrors(failure.fields); setError("Please check the highlighted fields."); }
+      return;
+    }
+    saving.current = true; setPending(true); setError(""); setErrors({});
+    try {
+      await saveAdminEvent(body, image, existing?.id);
+      toast.success(existing ? "Event updated." : body.status === "PUBLISHED" ? "Event published. Find it on the public Events page." : "Draft created. Drafts are visible only in admin Events.");
+      onCreated();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Unable to save the event.");
+      if (failure instanceof AdminEventRequestError) setErrors(failure.fields);
+    } finally { saving.current = false; setPending(false); }
+  }
+  function input(name: string, label: string, type = "text", required = false, maxLength?: number) {
+    return <label className="flex flex-col gap-2 text-sm font-medium" htmlFor={`event-${name}`}>{label}{required ? " *" : ""}<input id={`event-${name}`} name={name} type={type} required={required} maxLength={maxLength} min={type === "number" ? 1 : undefined} step={type === "number" ? 1 : undefined} aria-invalid={Boolean(errors[name])} aria-describedby={errors[name] ? `error-${name}` : undefined} defaultValue={existing ? name === "start_date" || name === "end_date" ? colomboDateInput(existing[name]) : String(existing[name as keyof AdminEvent] ?? "") : undefined} className={field} />{errors[name] && <span id={`error-${name}`} className="text-xs text-[#A6192E]">{errors[name]}</span>}</label>;
+  }
+  const message = (name: string) => errors[name] && <span className="text-xs text-[#A6192E]">{errors[name]}</span>;
+  return <dialog ref={dialog} aria-labelledby="create-event-title" onCancel={(event) => { event.preventDefault(); if (!pending && !checkingImage) onClose(); }} className="fixed inset-0 m-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-3xl border border-[#0B1B2B14] bg-white p-6 font-plex text-[#0B1B2B] backdrop:bg-[#0B1B2B66] sm:p-8">
+    <div className="flex items-center justify-between gap-4"><h2 id="create-event-title" className="text-xl font-semibold">{existing ? "Edit event" : "Create event"}</h2><button type="button" disabled={pending || checkingImage} onClick={onClose} aria-label="Close" className={button}>Close</button></div>
+    <p className="mt-3 text-sm leading-relaxed text-[#4A5B6B]">Enter dates and times in Sri Lanka time (UTC+05:30).</p>
+    <form onSubmit={submit} className="mt-6 space-y-5">
+      {error && <p role="alert" className="rounded-xl bg-[#A6192E0D] p-4 text-sm text-[#A6192E]">{error}</p>}
+      <fieldset disabled={pending} className="space-y-5">
+        {input("title", "Event title", "text", true, 255)}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="flex flex-col gap-2 text-sm font-medium">Chapter *<select name="chapter" defaultValue={existing?.chapter ?? chapter} disabled={!canChooseChapter || pending} className={field}>{(canChooseChapter ? CHAPTERS : [chapter]).map((item) => <option key={item}>{item}</option>)}</select>{message("chapter")}</label>
+          {!existing && <label className="flex flex-col gap-2 text-sm font-medium">Status *<select name="status" defaultValue="DRAFT" className={field}><option value="DRAFT">Draft</option><option value="PUBLISHED">Published</option></select>{message("status")}</label>}
+        </div>
+        {!existing && <p className="text-xs leading-relaxed text-[#4A5B6B]">Drafts stay in admin Events. Published events appear publicly under the matching Upcoming, Ongoing or Past filter.</p>}
+        <label className="flex flex-col gap-2 text-sm font-medium">Description<textarea name="description" defaultValue={existing?.description ?? ""} rows={4} maxLength={20000} className={field} />{message("description")}</label>
+        <div className="grid gap-5 sm:grid-cols-2">{input("start_date", "Start date and time", "datetime-local", true)}{input("end_date", "End date and time", "datetime-local", true)}</div>
+        <div className="grid gap-5 sm:grid-cols-2"><label className="flex flex-col gap-2 text-sm font-medium">Mode *<select name="mode" defaultValue={existing?.mode ?? "PHYSICAL"} className={field}>{EVENT_MODES.map((mode) => <option key={mode} value={mode}>{{ PHYSICAL: "In person", ONLINE: "Online", HYBRID: "Hybrid" }[mode]}</option>)}</select>{message("mode")}</label>{input("venue", "Venue or meeting details", "text", false, 255)}</div>
+        <EventCoverPicker existingUrl={existing?.cover_image_url ?? null} value={image} onChange={setImage} disabled={pending} onValidating={setCheckingImage} error={errors.cover_image_file || errors.cover_image || errors.remove_cover_image} />
+        <div className="grid gap-5 sm:grid-cols-2">{input("contact_email", "Contact email", "email", false, 255)}{input("contact_phone", "Contact phone", "tel", false, 50)}</div>
+        {input("max_participants", "Maximum participants (blank for no limit)", "number")}
+        <div className="flex flex-wrap gap-5 text-sm"><label className="flex items-center gap-2"><input type="checkbox" name="is_registration_open" defaultChecked={existing?.is_registration_open ?? false} className="accent-[#00629B]" />Open participant registration</label><label className="flex items-center gap-2"><input type="checkbox" name="is_oc_open" defaultChecked={existing?.is_oc_open ?? false} className="accent-[#00629B]" />Open OC applications</label></div>
+        <p className="text-xs leading-relaxed text-[#4A5B6B]">Registration also needs an enabled registration form. Creating an event does not create its forms.</p>
+      </fieldset>
+      <div className="flex justify-end gap-3 border-t border-[#0B1B2B14] pt-5"><button type="button" disabled={pending || checkingImage} onClick={onClose} className={button}>Cancel</button><button type="submit" disabled={pending || checkingImage} className={primary}>{pending ? "Saving…" : existing ? "Save changes" : "Create event"}</button></div>
+    </form>
+  </dialog>;
+}
 
 export default function AdminEventsPage() {
-  const { user } = useAdminUser();
-  const [events, setEvents] = useState<SrsEvent[]>(() => getStoredEvents());
-  const [filterUnit, setFilterUnit] = useState<string>("all");
-  const [notice, setNotice] = useState("");
-
-  const handleToggleParticipantForm = (event: SrsEvent) => {
-    // Permission gate (FR-EVT-02)
-    const canManage =
-      user.role === "sb_webmaster" ||
-      (user.role === "unit_webmaster" && user.assignedUnitId === event.unitId) ||
-      hasPermission(user, "form.manage", "EVENT", event.id);
-
-    if (!canManage) {
-      alert("Permission Denied: You cannot modify forms for this unit's event.");
-      return;
+  const user = useAppSelector((state) => state.auth.user);
+  const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
+  const [filters, setFilters] = useState({ page: 1, status: "", search: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<AdminEvent | null>(null);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [reload, setReload] = useState(0);
+  const filterForm = useRef<HTMLFormElement>(null);
+  const canUpdate = hasPermission(user, "UPDATE_EVENT");
+  async function edit(id: number) {
+    if (loadingEdit) return;
+    setLoadingEdit(true);
+    try { setEditing(parseAdminEvent(await adminEventRequest(`/${id}`))); }
+    catch (failure) { toast.error(failure instanceof Error ? failure.message : "Unable to load event."); }
+    finally { setLoadingEdit(false); }
+  }
+  const canCreate = hasPermission(user, "CREATE_EVENT");
+  const canChooseChapter = user?.chapter === "SB" && user.user_group_name?.trim().toLowerCase() === "webmaster";
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const query = new URLSearchParams({ page: String(filters.page), status: filters.status, search: filters.search });
+        const result = await loadAdminEvents(`?${query}`, filters.page, controller.signal);
+        if (!controller.signal.aborted) { setCatalogue(result); setError(""); }
+      } catch (failure) { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Unable to load events."); }
+      finally { if (!controller.signal.aborted) setLoading(false); }
     }
-
-    const updated: SrsEvent = {
-      ...event,
-      participantForm: {
-        ...event.participantForm,
-        isEnabled: !event.participantForm.isEnabled,
-      },
-    };
-    updateEvent(updated, user);
-    setEvents(getStoredEvents());
-    setNotice(`Updated participant form status for ${event.title}.`);
-    setTimeout(() => setNotice(""), 3500);
-  };
-
-  const handleToggleOcForm = (event: SrsEvent) => {
-    const canManage =
-      user.role === "sb_webmaster" ||
-      (user.role === "unit_webmaster" && user.assignedUnitId === event.unitId) ||
-      hasPermission(user, "form.manage", "EVENT", event.id);
-
-    if (!canManage) {
-      alert("Permission Denied: You cannot modify forms for this unit's event.");
-      return;
-    }
-
-    const updated: SrsEvent = {
-      ...event,
-      ocForm: {
-        ...event.ocForm,
-        isEnabled: !event.ocForm.isEnabled,
-      },
-    };
-    updateEvent(updated, user);
-    setEvents(getStoredEvents());
-    setNotice(`Updated OC recruitment form status for ${event.title}.`);
-    setTimeout(() => setNotice(""), 3500);
-  };
-
-  const handleToggleEventState = (event: SrsEvent, newState: "published" | "cancelled" | "draft") => {
-    const canPublish =
-      user.role === "sb_webmaster" ||
-      (user.role === "unit_webmaster" && user.assignedUnitId === event.unitId) ||
-      hasPermission(user, "event.publish", "EVENT", event.id);
-
-    if (!canPublish) {
-      alert("Permission Denied: You lack event.publish permission for this event.");
-      return;
-    }
-
-    const updated: SrsEvent = {
-      ...event,
-      state: newState,
-      // FR-EVT-08: Cancellation automatically closes forms
-      ...(newState === "cancelled"
-        ? {
-            participantForm: { ...event.participantForm, isEnabled: false },
-            ocForm: { ...event.ocForm, isEnabled: false },
-          }
-        : {}),
-    };
-
-    updateEvent(updated, user);
-    setEvents(getStoredEvents());
-    setNotice(`Event state transitioned to ${newState.toUpperCase()} (FR-EVT-06 / FR-EVT-08).`);
-    setTimeout(() => setNotice(""), 3500);
-  };
-
-  const filteredEvents = events.filter((e) => {
-    if (filterUnit !== "all" && e.unitId !== filterUnit) return false;
-    return true;
-  });
-
-  return (
-    <AdminShell>
-      <div className="flex flex-col gap-8">
-        {/* Header */}
-        <div className="flex flex-col gap-2 rounded-2xl border border-[#D9D9D9] bg-white p-6 md:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00629B]">
-                EVENT CATALOG & FORM WINDOW SCHEDULER (FR-EVT-01, FR-FORM-03)
-              </span>
-              <h1 className="text-2xl font-bold tracking-tight text-[#111111]">
-                Events & Dynamic Form Administration
-              </h1>
-              <p className="text-sm text-[#4A5B6B]">
-                Control event publication lifecycles and toggle participant vs OC intake schedules independently.
-              </p>
-            </div>
-          </div>
-
-          {/* Unit Filters */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-[#E2E8F0]">
-            {["all", "sb", "cs", "ias", "ras", "wie"].map((u) => (
-              <button
-                key={u}
-                type="button"
-                onClick={() => setFilterUnit(u)}
-                className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase transition-colors ${
-                  filterUnit === u
-                    ? "bg-[#00629B] text-white"
-                    : "border border-[#D9D9D9] bg-white text-[#4A5B6B] hover:bg-[#F7F9FB]"
-                }`}
-              >
-                {u === "all" ? "All Units" : u}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {notice ? (
-          <div className="flex items-center gap-2 rounded-xl border border-[#00843D33] bg-[#00843D0D] p-4 text-xs font-semibold text-[#00843D]">
-            <CheckCircle size={18} weight="fill" />
-            {notice}
-          </div>
-        ) : null}
-
-        {/* Event List */}
-        <div className="flex flex-col gap-6">
-          {filteredEvents.map((evt) => {
-            const canManage =
-              user.role === "sb_webmaster" ||
-              (user.role === "unit_webmaster" && user.assignedUnitId === evt.unitId) ||
-              hasPermission(user, "event.manage", "EVENT", evt.id);
-
-            return (
-              <div
-                key={evt.id}
-                className="flex flex-col gap-6 rounded-2xl border border-[#D9D9D9] bg-white p-6 md:p-8"
-              >
-                {/* Event Title Row */}
-                <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E2E8F0] pb-4">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-md border border-[#D9D9D9] bg-[#F7F9FB] px-2 py-0.5 font-mono text-[10px] font-bold text-[#00629B]">
-                        UNIT: {evt.unitId.toUpperCase()}
-                      </span>
-                      <span
-                        className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-bold ${
-                          evt.state === "published"
-                            ? "bg-[#00843D1A] text-[#00843D]"
-                            : evt.state === "cancelled"
-                              ? "bg-[#A6192E1A] text-[#A6192E]"
-                              : "bg-[#F7F9FB] text-[#667585]"
-                        }`}
-                      >
-                        {evt.state.toUpperCase()}
-                      </span>
-                      <span className="font-mono text-xs text-[#667585]">
-                        {evt.mode.toUpperCase()} · CAPACITY: {evt.capacityLimit}
-                      </span>
-                    </div>
-                    <h2 className="text-xl font-bold tracking-tight text-[#111111]">
-                      {evt.title}
-                    </h2>
-                    <p className="text-xs text-[#4A5B6B]">
-                      {evt.day} {evt.month} {evt.year} · {evt.time} · {evt.venue}
-                    </p>
-                  </div>
-
-                  {/* State Change Buttons (FR-EVT-06, FR-EVT-08) */}
-                  <div className="flex items-center gap-2">
-                    {evt.state !== "published" ? (
-                      <button
-                        type="button"
-                        onClick={() => handleToggleEventState(evt, "published")}
-                        disabled={!canManage}
-                        className="rounded-xl bg-[#00843D] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#00622E] disabled:opacity-40"
-                      >
-                        Publish Event
-                      </button>
-                    ) : null}
-
-                    {evt.state !== "cancelled" ? (
-                      <button
-                        type="button"
-                        onClick={() => handleToggleEventState(evt, "cancelled")}
-                        disabled={!canManage}
-                        className="rounded-xl border border-[#A6192E33] bg-[#A6192E0D] px-3 py-1.5 text-xs font-semibold text-[#A6192E] hover:bg-[#A6192E1A] disabled:opacity-40"
-                      >
-                        Cancel Event (FR-EVT-08)
-                      </button>
-                    ) : null}
-
-                    <Link
-                      href={`/events/${evt.slug}`}
-                      target="_blank"
-                      className="flex items-center gap-1 rounded-xl border border-[#D9D9D9] px-3 py-1.5 text-xs font-semibold text-[#4A5B6B] hover:bg-[#F7F9FB]"
-                    >
-                      Public Page
-                      <ArrowSquareOut size={14} />
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Independent Form Schedule Windows (FR-FORM-03, BR-03) */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                  {/* Participant Registration Window */}
-                  <div className="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F7F9FB] p-5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00629B]">
-                        PARTICIPANT REGISTRATION FORM
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleParticipantForm(evt)}
-                        disabled={!canManage || evt.state === "cancelled"}
-                        className="flex items-center gap-1 text-xs font-semibold text-[#00629B] disabled:opacity-40"
-                      >
-                        {evt.participantForm.isEnabled ? (
-                          <>
-                            <ToggleRight size={24} weight="fill" className="text-[#00843D]" />
-                            <span className="text-[#00843D]">OPEN</span>
-                          </>
-                        ) : (
-                          <>
-                            <ToggleLeft size={24} weight="fill" className="text-[#667585]" />
-                            <span className="text-[#667585]">CLOSED</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="text-xs text-[#4A5B6B]">
-                      <p className="font-medium text-[#111111]">{evt.participantForm.title}</p>
-                      <p className="mt-1 font-mono text-[11px] text-[#667585]">
-                        Questions: {evt.participantForm.fields.length} dynamic schema fields
-                      </p>
-                    </div>
-
-                    <div className="mt-2 flex flex-col gap-1 rounded-lg border border-[#D9D9D9] bg-white p-2.5 font-mono text-[11px] text-[#667585]">
-                      <div>SCHEDULED OPEN: {new Date(evt.participantForm.openAt).toLocaleDateString()}</div>
-                      <div>SCHEDULED CLOSE: {new Date(evt.participantForm.closeAt).toLocaleDateString()}</div>
-                    </div>
-                  </div>
-
-                  {/* Organizing Committee (OC) Intake Window */}
-                  <div className="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F7F9FB] p-5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00629B]">
-                        ORGANIZING COMMITTEE (OC) RECRUITMENT
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleOcForm(evt)}
-                        disabled={!canManage || evt.state === "cancelled"}
-                        className="flex items-center gap-1 text-xs font-semibold text-[#00629B] disabled:opacity-40"
-                      >
-                        {evt.ocForm.isEnabled ? (
-                          <>
-                            <ToggleRight size={24} weight="fill" className="text-[#00843D]" />
-                            <span className="text-[#00843D]">OPEN</span>
-                          </>
-                        ) : (
-                          <>
-                            <ToggleLeft size={24} weight="fill" className="text-[#667585]" />
-                            <span className="text-[#667585]">CLOSED</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="text-xs text-[#4A5B6B]">
-                      <p className="font-medium text-[#111111]">{evt.ocForm.title}</p>
-                      <p className="mt-1 font-mono text-[11px] text-[#667585]">
-                        Questions: {evt.ocForm.fields.length} volunteer intake fields
-                      </p>
-                    </div>
-
-                    <div className="mt-2 flex flex-col gap-1 rounded-lg border border-[#D9D9D9] bg-white p-2.5 font-mono text-[11px] text-[#667585]">
-                      <div>SCHEDULED OPEN: {new Date(evt.ocForm.openAt).toLocaleDateString()}</div>
-                      <div>SCHEDULED CLOSE: {new Date(evt.ocForm.closeAt).toLocaleDateString()}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Links Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E2E8F0] pt-4">
-                  <span className="font-mono text-xs text-[#667585]">
-                    EVENT ID: {evt.id}
-                  </span>
-
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/admin/events/${evt.id}/responses`}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-[#D9D9D9] bg-white px-3.5 py-2 text-xs font-semibold text-[#111111] hover:bg-[#F7F9FB]"
-                    >
-                      <UsersThree size={16} weight="bold" />
-                      View Responses & CSV
-                    </Link>
-
-                    <Link
-                      href={`/admin/attendance/${evt.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#00629B] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#005282]"
-                    >
-                      <QrCode size={16} weight="bold" />
-                      QR Attendance Scanner
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </AdminShell>
-  );
+    void load(); return () => controller.abort();
+  }, [filters, reload]);
+  function refresh() { setLoading(true); setReload((current) => current + 1); }
+  return <AdminShell><div className="space-y-6">
+    <header className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="text-3xl font-semibold">Events</h1><p className="mt-2 text-sm text-[#4A5B6B]">Manage your chapter’s events. Drafts and published events are listed here.</p></div>{canCreate && <button onClick={() => setCreating(true)} className={primary}>Create event</button>}</header>
+    <section className="overflow-hidden rounded-3xl border border-[#0B1B2B14] bg-white">
+      <form ref={filterForm} onSubmit={(event) => { event.preventDefault(); const data = new FormData(event.currentTarget); setLoading(true); setFilters({ page: 1, status: String(data.get("status") ?? ""), search: String(data.get("search") ?? "").trim() }); }} className="flex flex-wrap items-end gap-4 border-b border-[#0B1B2B14] p-6">
+        <label className="flex flex-1 flex-col gap-2 text-sm">Search events<input name="search" maxLength={255} className={field} placeholder="Search by title or description" /></label>
+        <label className="flex flex-col gap-2 text-sm">Status<select name="status" className={field}><option value="">All statuses</option>{EVENT_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <button type="submit" className={button}>Search</button><button type="button" onClick={refresh} disabled={loading} className={button}>Refresh</button>
+      </form>
+      {loading ? <p role="status" className="p-8 text-sm text-[#4A5B6B]">Loading events…</p> : error ? <div role="alert" className="p-8 text-sm text-[#A6192E]">{error}<button onClick={refresh} className="ml-3 underline">Try again</button></div> : !catalogue?.data.length ? <p className="p-8 text-sm text-[#4A5B6B]">No events match these filters.</p> : <div className="divide-y divide-[#0B1B2B14]">{catalogue.data.map((event) => <article key={event.id} className="flex flex-wrap items-center justify-between gap-5 p-6"><div className="flex min-w-0 items-start gap-5"><EventImage src={event.cover_image_url || "/photos/robotics-arm.jpg"} alt="" width={160} height={100} className="h-24 w-36 rounded-xl object-cover" /><div className="min-w-0"><div className="mb-3 flex items-center gap-3 text-xs"><span className="rounded-full bg-[#00629B0D] px-3 py-1 text-[#00629B]">{event.chapter}</span><span className="font-medium text-[#4A5B6B]">{event.status}</span></div><h2 className="break-words text-lg font-semibold">{event.title}</h2><p className="mt-2 text-sm text-[#4A5B6B]">{eventDate(event.start_date)} (Sri Lanka)</p><p className="mt-1 text-xs text-[#4A5B6B]">{event.mode}{event.venue ? ` · ${event.venue}` : ""}</p></div></div><div className="flex flex-wrap items-center gap-3">{canUpdate && <button type="button" disabled={loadingEdit} onClick={() => void edit(event.id)} className={button}>Edit event</button>}{event.status === "PUBLISHED" ? <Link href={`/events/${encodeURIComponent(event.slug)}`} className={button}>View public event</Link> : <span className="text-xs text-[#4A5B6B]">Not publicly listed</span>}</div></article>)}</div>}
+      {catalogue && !loading && !error && <nav aria-label="Event pages" className="flex flex-wrap items-center justify-between gap-4 border-t border-[#0B1B2B14] p-6 text-sm text-[#4A5B6B]"><p>{catalogue.total} events · Page {catalogue.current_page} of {catalogue.last_page}</p><div className="flex gap-3"><button className={button} disabled={filters.page <= 1} onClick={() => { setLoading(true); setFilters({ ...filters, page: filters.page - 1 }); }}>Previous</button><button className={button} disabled={filters.page >= catalogue.last_page} onClick={() => { setLoading(true); setFilters({ ...filters, page: filters.page + 1 }); }}>Next</button></div></nav>}
+    </section>
+    <Link href="/events?timeframe=all" className="inline-block text-sm font-medium text-[#00629B] hover:underline">Browse all published events →</Link>
+    {(creating || editing) && user && <EventDialog key={editing?.id ?? "create"} existing={editing ?? undefined} chapter={user.chapter} canChooseChapter={canChooseChapter} onClose={() => { setCreating(false); setEditing(null); }} onCreated={() => { setCreating(false); setEditing(null); filterForm.current?.reset(); setLoading(true); setFilters({ page: 1, status: "", search: "" }); }} />}
+  </div></AdminShell>;
 }

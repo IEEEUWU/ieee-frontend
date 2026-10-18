@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { EventImage as Image } from "@/components/sections/event-image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { BORDER_CARD, LABEL_XS } from "@/components/sections/landing/styles";
@@ -19,6 +19,7 @@ export type EventRecord = {
   readonly cover: string;
   /** Present only on published rows — those are the ones with a route. */
   readonly slug?: string;
+  readonly unoptimized?: boolean;
 };
 
 /** The branch's own blue, for a tag that names no chartered society. */
@@ -69,6 +70,7 @@ export function EventCard({ event }: { event: EventRecord }) {
       <div className="relative">
         <Image
           src={event.cover}
+          unoptimized={event.unoptimized}
           alt=""
           width={960}
           height={600}
@@ -99,7 +101,7 @@ export function EventCard({ event }: { event: EventRecord }) {
   );
 
   return event.slug ? (
-    <Link href={`/events/${event.slug}`} className={shell} style={style}>
+    <Link href={`/events/${encodeURIComponent(event.slug)}`} className={shell} style={style}>
       {body}
     </Link>
   ) : (

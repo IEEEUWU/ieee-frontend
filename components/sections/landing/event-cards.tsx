@@ -1,88 +1,24 @@
-"use client";
-
-import { useState } from "react";
-import type { CSSProperties } from "react";
-import { EVENTS, PAST_EVENTS } from "./data";
+﻿import Link from "next/link";
 import { SectionHeading } from "./heading";
-import { EventCard, type EventRecord } from "@/components/sections/event-card";
-import { PendingCard } from "@/components/sections/unit/section";
-
-/**
- * Event cards: the events page's own composition of the programme.
- *
- * The chapter page's tabs, reused whole: one heading, one pair of segmented
- * pills — Upcoming over the published calendar, Past over the archive — and
- * the same three-up card grid underneath, so the branch calendar and a
- * chapter's Events section are the same object in two hues. The section sets
- * the unit vars to branch blue, the page's own accent, for the tabs' active
- * state; each card still resolves its colours from its own tag, so every
- * event keeps its hosting chapter's identity in either view.
- *
- * The empty view keeps the designed pending card rather than a blank grid,
- * so an archive the branch has not filled yet reads as awaited, not broken.
- */
-export function LandingEventCards() {
-  const [view, setView] = useState<"upcoming" | "past">("upcoming");
-  // Widened to the card's own record so the two tuples share one map.
-  const events: readonly EventRecord[] =
-    view === "upcoming" ? EVENTS : PAST_EVENTS;
-
-  return (
-    <section
-      id="events"
-      data-land="event-cards"
-      className="flex w-full max-w-[1120px] flex-col items-start gap-10 px-10 pb-[120px]"
-      style={
-        {
-          "--unit-brand": "#00629B",
-          "--unit-ink": "#00629B",
-          "--unit-tint": "#00629B14",
-          "--unit-hover": "#00629B2E",
-        } as CSSProperties
-      }
-    >
-      <SectionHeading
-        title="Upcoming and past events"
-        lede="What the branch is running next, and what it has already run."
-      />
-
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex w-full flex-row items-center gap-1">
-          {(["upcoming", "past"] as const).map((key) => (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={view === key}
-              onClick={() => setView(key)}
-              className={`rounded-full px-5 py-2.5 text-[15px] font-medium transition-colors ${
-                view === key
-                  ? "bg-(--unit-tint) text-(--unit-ink)"
-                  : "text-[#4A5B6B] hover:bg-(--unit-hover)"
-              }`}
-            >
-              {key === "upcoming" ? "Upcoming" : "Past"}
-            </button>
-          ))}
-        </div>
-
-        {events.length > 0 ? (
-          <div className="grid w-full grid-cols-3 gap-10">
-            {events.map((event) => (
-              <EventCard key={event.title} event={event} />
-            ))}
-          </div>
-        ) : view === "upcoming" ? (
-          <PendingCard title="SCHEDULE PENDING">
-            No upcoming events are published yet. The calendar is listed here
-            once confirmed.
-          </PendingCard>
-        ) : (
-          <PendingCard title="EVENT ARCHIVE PENDING">
-            Past events are not archived publicly yet. Records are listed here
-            as the branch publishes them.
-          </PendingCard>
-        )}
-      </div>
-    </section>
-  );
+import { EventCard } from "@/components/sections/event-card";
+import { CHAPTERS, TIMEFRAMES, eventCard, eventFilters, eventQuery } from "@/lib/events/shared";
+import { loadPublicEvents, publicEventCover } from "@/lib/events/server";
+const button = "rounded-full border border-[#0B1B2B26] px-5 py-2.5 text-[15px] font-medium text-[#00629B] hover:bg-[#00629B14]";
+export async function LandingEventCards({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
+  let filters;
+  try { filters = eventFilters(searchParams); }
+  catch (error) { return <section className="w-full max-w-[1120px] px-10 pb-30"><p role="alert" className="mb-6 text-[#A6192E]">{error instanceof Error ? error.message : "Check your event filters."}</p><Link href="/events" className={button}>Reset filters</Link></section>; }
+  const catalogue = await loadPublicEvents(filters);
+  return <section id="events" data-land="event-cards" className="flex w-full max-w-[1120px] flex-col items-start gap-10 px-10 pb-[120px]">
+    <SectionHeading title="Upcoming and past events" lede="What the branch is running next, and what it has already run." />
+    <nav aria-label="Event timeframe" className="flex flex-wrap gap-2">{TIMEFRAMES.map((timeframe) => <Link key={timeframe} href={`/events?${eventQuery({ ...filters, timeframe, page: 1 })}`} aria-current={filters.timeframe === timeframe ? "page" : undefined} className={`${button} capitalize ${filters.timeframe === timeframe ? "bg-[#00629B14]" : ""}`}>{timeframe === "all" ? "All events" : timeframe}</Link>)}</nav>
+    <form action="/events" className="flex w-full flex-wrap items-end gap-4">
+      <input type="hidden" name="timeframe" value={filters.timeframe} /><input type="hidden" name="per_page" value={filters.per_page} />
+      <label className="flex flex-1 flex-col gap-2 text-sm text-[#4A5B6B]">Search events<input name="search" defaultValue={filters.search} maxLength={255} placeholder="Search by title or description" className="min-w-60 rounded-xl border border-[#0B1B2B26] bg-white px-4 py-3" /></label>
+      <label className="flex flex-col gap-2 text-sm text-[#4A5B6B]">Chapter<select name="chapter" defaultValue={filters.chapter} className="rounded-xl border border-[#0B1B2B26] bg-white px-4 py-3"><option value="">All chapters</option>{CHAPTERS.map((chapter) => <option key={chapter}>{chapter}</option>)}</select></label>
+      <button type="submit" className="rounded-full bg-[#00629B] px-6 py-3 text-white hover:bg-[#005282]">Find events</button>
+    </form>
+    {catalogue.data.length ? <div className="grid w-full grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">{catalogue.data.map((event) => <EventCard key={event.id} event={eventCard(event, publicEventCover(event.cover_image_url !== undefined ? event.cover_image_url : event.cover_image))} />)}</div> : <div role="status" className="w-full rounded-3xl border border-[#0B1B2B26] bg-white p-8 text-[#4A5B6B]">No published events match these filters.</div>}
+    <nav aria-label="Event pages" className="flex w-full flex-wrap items-center justify-between gap-4 text-sm text-[#4A5B6B]"><p>Showing {catalogue.from ?? 0}–{catalogue.to ?? 0} of {catalogue.total} events</p><div className="flex items-center gap-4">{filters.page > 1 && <Link className={button} href={`/events?${eventQuery({ ...filters, page: filters.page - 1 })}`}>Previous</Link>}<span>Page {catalogue.current_page} of {catalogue.last_page}</span>{filters.page < catalogue.last_page && <Link className={button} href={`/events?${eventQuery({ ...filters, page: filters.page + 1 })}`}>Next</Link>}</div></nav>
+  </section>;
 }
