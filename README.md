@@ -264,3 +264,31 @@ Expectations of behaviour: **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**.
 ## Licence
 
 No licence has been declared. The repository has no `LICENSE` file, which means "all rights reserved" by default. Add one before the project is published or forked externally.
+
+## Backend authentication
+
+The unlinked login page is `/auth/login`. Next.js forwards every backend request using the required server-only `AUTH_API_BASE_URL` setting in the root `.env` file (include `/api`). There is no hardcoded backend URL or localhost fallback. Browser requests use same-origin Next.js routes to preserve HttpOnly cookie handling. Restart Next.js after changing it. In a deployed environment, this URL must point to a backend reachable from the Next.js server.
+
+The JWT lives only in the `ieee_access_token` HttpOnly cookie (SameSite=Lax; Secure in production). Redux holds authentication status, pending state, and expiry, never the JWT. Login redirects to `/admin`; failed responses use Sonner toasts. Refresh runs one minute before expiry, serializes requests across supported browser tabs using Web Locks, and replaces the cookie. Logout clears the local session even on backend failure. An expired or rejected session returns to `/auth/login`.
+
+For new protected backend integrations, use `protectedBackendRequest` from `lib/auth/server.ts` in a same-origin Next.js route handler and `protectedFetch` from `lib/auth/client.ts` in the client. Check `sameOrigin` for mutating handlers. These helpers attach bearer authorization on the server and handle backend 401 responses without exposing the token to JavaScript.
+
+The admin workspace fetches `GET /auth/me` through the server using the HttpOnly cookie token as a bearer header. Redux stores the validated account profile. User groups map to 1 = Webmaster, 2 = Chair Person, and 3 = Secretary; dashboards use the SB, IAS, CS, WIE, or RAS chapter returned by the backend. Metrics, priorities, and activities are explicitly labeled sample data. Identity switching is removed. Unknown roles get a role-pending screen; inactive accounts are denied. Backend permissions must still be enforced by every protected endpoint. Older admin module pages remain demo implementations and are not linked from the new dashboard.
+
+Run the mocked auth contract checks with `node --test tests/auth.test.cjs`.
+
+## Permission management
+
+`/admin/permissions` uses the backend permission catalogue and Axios server routes. The sidebar appears when the current user has any of `CREATE_PERMISSION`, `VIEW_PERMISSIONS`, `UPDATE_PERMISSION`, or `DELETE_PERMISSION`. Each action checks its matching code in the UI and checks a fresh authenticated profile on the server; role and chapter never imply a grant. Redux holds the catalogue and effective permission codes. Permission-denied responses show toasts without ending the session; 401 responses require login again.
+
+The current backend `/auth/me` returns before serializing `effective_permissions`. When that field is missing, the server resolves permissions with `/get-user/{authenticated-user-id}`. Once `/auth/me` includes the field, the extra request is skipped. Only the ID returned by the authenticated backend response is used.
+
+Create uses POST `/create-permission`; update uses PUT `/update-permission/{id}`; list and detail use GET `/get-permissions` and `/get-permission/{id}`; deletion uses DELETE `/delete-permission/{id}`. Every backend request uses the required `.env` base URL and bearer token read from the HttpOnly cookie. Backend routes should also enforce their permission middleware; the frontend server currently checks all four codes even where the backend has not attached middleware.
+
+## User group management
+
+`/admin/usergroups` lists groups, supports backend pagination, and offers create, edit, delete, and permission assignment actions. The sidebar and actions use `CREATE_USERGROUP`, `VIEW_USERGROUPS`, `UPDATE_USERGROUP`, `DELETE_USERGROUP`, and `ASSIGN_USERGROUP_PERMISSIONS`; each API handler checks the matching code against a fresh authenticated profile. Permission selection requires `VIEW_PERMISSIONS` and loads all pages of the permission catalogue into searchable checkbox cards.
+
+Create sends numeric permission IDs to POST `/create-usergroup`. Edit sends numeric permission IDs to PUT `/update-usergroup/{id}`. The separate assignment action sends `{ user_group_id, permissions: number[] }` to POST `/assign-usergroup-permissions`. List uses GET `/get-usergroups?page={page}`, and delete uses DELETE `/delete-usergroup/{id}`. The local routes use the existing configured backend base URL and server-held bearer token.
+
+The list accepts a plain group array or the same paginator envelope as the permission service. Group records use `id`, `group_name`, `group_description`, and optional `permissions` containing IDs, codes, or permission relation objects. Missing or unavailable assignments require an explicit replacement selection before saving, so an omitted relationship cannot silently clear existing permissions. Successful changes refresh the authenticated profile and current list.
