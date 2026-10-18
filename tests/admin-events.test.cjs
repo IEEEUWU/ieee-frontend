@@ -241,3 +241,49 @@ test('native FormData reaches an HTTP backend with a generated boundary, bearer 
     if (previousBase === undefined) delete process.env.AUTH_API_BASE_URL; else process.env.AUTH_API_BASE_URL = previousBase;
   }
 });
+
+test('DELETE event forwards no body and requires DELETE_EVENT rather than create/update permissions', async () => {
+  const api = handler({ codes: ['DELETE_EVENT'], backendStatus: 200, backendBody: { message: 'Event archived successfully' } });
+  const response = await api.handleAdminEvents(request('DELETE'), '7');
+  assert.equal(response.status, 200); assert.equal((await response.json()).message, 'Event archived successfully');
+  assert.deepEqual(api.requests, [{ path: '/events/7', options: { method: 'DELETE' } }]);
+  for (const codes of [[], ['CREATE_EVENT'], ['UPDATE_EVENT']]) {
+    const forbidden = handler({ codes });
+    assert.equal((await forbidden.handleAdminEvents(request('DELETE'), '7')).status, 403);
+    assert.equal(forbidden.requests.length, 0);
+  }
+});
+test('DELETE blocks cross-origin requests, invalid IDs, anonymous sessions and collection deletion', async () => {
+  const api = handler({ codes: ['DELETE_EVENT'] });
+  assert.equal((await api.handleAdminEvents(request('DELETE', undefined, '', 'https://external.example'), '7')).status, 403);
+  for (const id of ['0', '../7', '7.1', '9007199254740992']) assert.equal((await api.handleAdminEvents(request('DELETE'), id)).status, 422);
+  assert.equal((await api.handleAdminEvents(request('DELETE'))).status, 405);
+  assert.equal(api.requests.length, 0);
+  const anonymous = handler({ codes: ['DELETE_EVENT'], profileStatus: 401 });
+  assert.equal((await anonymous.handleAdminEvents(request('DELETE'), '7')).status, 401);
+  assert.equal(anonymous.requests.length, 0);
+});
+test('DELETE preserves chapter and missing-event errors and handles service failures', async () => {
+  for (const status of [403, 404, 500]) {
+    const api = handler({ codes: ['DELETE_EVENT'], backendStatus: status, backendBody: { error: status === 403 ? 'Forbidden' : 'Event not found' } });
+    const response = await api.handleAdminEvents(request('DELETE'), '7');
+    assert.equal(response.status, status);
+    assert.ok((await response.json()).error);
+    assert.equal(api.requests.length, 1);
+  }
+});
+test('delete client sends DELETE without metadata or image payload and accepts empty success', async () => {
+  const requests = [];
+  const client = load('lib/events/admin-client.ts', { '@/lib/auth/client': { protectedFetch: async (path, options) => { requests.push({ path, options }); return new Response(null, { status: 204 }); } }, './admin-shared': admin, './cover': cover });
+  await client.deleteAdminEvent(7);
+  assert.equal(requests[0].path, '/api/events/7'); assert.equal(requests[0].options.method, 'DELETE');
+  assert.equal(requests[0].options.body, undefined); assert.equal(requests[0].options.headers, undefined);
+  for (const id of [0, -1, 1.5, NaN]) assert.throws(() => client.deleteAdminEvent(id), /Invalid event ID/);
+  assert.equal(requests.length, 1);
+});
+test('delete client surfaces failures without automatically retrying an uncertain deletion', async () => {
+  let calls = 0;
+  const client = load('lib/events/admin-client.ts', { '@/lib/auth/client': { protectedFetch: async () => { calls += 1; throw Error('connection interrupted'); } }, './admin-shared': admin, './cover': cover });
+  await assert.rejects(client.deleteAdminEvent(7), /Deletion could not be confirmed/);
+  assert.equal(calls, 1);
+});

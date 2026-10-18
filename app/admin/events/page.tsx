@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { EventCoverPicker } from "@/components/admin/event-cover-picker";
+import { DeleteEventDialog } from "@/components/admin/delete-event-dialog";
 import { EventImage } from "@/components/sections/event-image";
 import type { EventImageSelection } from "@/lib/events/cover";
 import { AdminShell } from "@/components/admin/admin-shell";
@@ -96,10 +97,12 @@ export default function AdminEventsPage() {
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<AdminEvent | null>(null);
+  const [deleting, setDeleting] = useState<AdminEvent | null>(null);
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [reload, setReload] = useState(0);
   const filterForm = useRef<HTMLFormElement>(null);
   const canUpdate = hasPermission(user, "UPDATE_EVENT");
+  const canDelete = hasPermission(user, "DELETE_EVENT");
   async function edit(id: number) {
     if (loadingEdit) return;
     setLoadingEdit(true);
@@ -130,10 +133,11 @@ export default function AdminEventsPage() {
         <label className="flex flex-col gap-2 text-sm">Status<select name="status" className={field}><option value="">All statuses</option>{EVENT_STATUSES.map((status) => <option key={status}>{status}</option>)}</select></label>
         <button type="submit" className={button}>Search</button><button type="button" onClick={refresh} disabled={loading} className={button}>Refresh</button>
       </form>
-      {loading ? <p role="status" className="p-8 text-sm text-[#4A5B6B]">Loading events…</p> : error ? <div role="alert" className="p-8 text-sm text-[#A6192E]">{error}<button onClick={refresh} className="ml-3 underline">Try again</button></div> : !catalogue?.data.length ? <p className="p-8 text-sm text-[#4A5B6B]">No events match these filters.</p> : <div className="divide-y divide-[#0B1B2B14]">{catalogue.data.map((event) => <article key={event.id} className="flex flex-wrap items-center justify-between gap-5 p-6"><div className="flex min-w-0 items-start gap-5"><EventImage src={event.cover_image_url || "/photos/robotics-arm.jpg"} alt="" width={160} height={100} className="h-24 w-36 rounded-xl object-cover" /><div className="min-w-0"><div className="mb-3 flex items-center gap-3 text-xs"><span className="rounded-full bg-[#00629B0D] px-3 py-1 text-[#00629B]">{event.chapter}</span><span className="font-medium text-[#4A5B6B]">{event.status}</span></div><h2 className="break-words text-lg font-semibold">{event.title}</h2><p className="mt-2 text-sm text-[#4A5B6B]">{eventDate(event.start_date)} (Sri Lanka)</p><p className="mt-1 text-xs text-[#4A5B6B]">{event.mode}{event.venue ? ` · ${event.venue}` : ""}</p></div></div><div className="flex flex-wrap items-center gap-3">{canUpdate && <button type="button" disabled={loadingEdit} onClick={() => void edit(event.id)} className={button}>Edit event</button>}{event.status === "PUBLISHED" ? <Link href={`/events/${encodeURIComponent(event.slug)}`} className={button}>View public event</Link> : <span className="text-xs text-[#4A5B6B]">Not publicly listed</span>}</div></article>)}</div>}
+      {loading ? <p role="status" className="p-8 text-sm text-[#4A5B6B]">Loading events…</p> : error ? <div role="alert" className="p-8 text-sm text-[#A6192E]">{error}<button onClick={refresh} className="ml-3 underline">Try again</button></div> : !catalogue?.data.length ? <p className="p-8 text-sm text-[#4A5B6B]">No events match these filters.</p> : <div className="divide-y divide-[#0B1B2B14]">{catalogue.data.map((event) => <article key={event.id} className="flex flex-wrap items-center justify-between gap-5 p-6"><div className="flex min-w-0 items-start gap-5"><EventImage src={event.cover_image_url || "/photos/robotics-arm.jpg"} alt="" width={160} height={100} className="h-24 w-36 rounded-xl object-cover" /><div className="min-w-0"><div className="mb-3 flex items-center gap-3 text-xs"><span className="rounded-full bg-[#00629B0D] px-3 py-1 text-[#00629B]">{event.chapter}</span><span className="font-medium text-[#4A5B6B]">{event.status}</span></div><h2 className="break-words text-lg font-semibold">{event.title}</h2><p className="mt-2 text-sm text-[#4A5B6B]">{eventDate(event.start_date)} (Sri Lanka)</p><p className="mt-1 text-xs text-[#4A5B6B]">{event.mode}{event.venue ? ` · ${event.venue}` : ""}</p></div></div><div className="flex flex-wrap items-center gap-3">{canUpdate && <button type="button" disabled={loadingEdit} onClick={() => void edit(event.id)} className={button}>Edit event</button>}{canDelete && <button type="button" disabled={loadingEdit} onClick={() => setDeleting(event)} className="rounded-full border border-[#A6192E33] px-4 py-2.5 text-sm font-medium text-[#A6192E] hover:bg-[#A6192E0D] disabled:opacity-50">Delete event</button>}{event.status === "PUBLISHED" ? <Link href={`/events/${encodeURIComponent(event.slug)}`} className={button}>View public event</Link> : <span className="text-xs text-[#4A5B6B]">Not publicly listed</span>}</div></article>)}</div>}
       {catalogue && !loading && !error && <nav aria-label="Event pages" className="flex flex-wrap items-center justify-between gap-4 border-t border-[#0B1B2B14] p-6 text-sm text-[#4A5B6B]"><p>{catalogue.total} events · Page {catalogue.current_page} of {catalogue.last_page}</p><div className="flex gap-3"><button className={button} disabled={filters.page <= 1} onClick={() => { setLoading(true); setFilters({ ...filters, page: filters.page - 1 }); }}>Previous</button><button className={button} disabled={filters.page >= catalogue.last_page} onClick={() => { setLoading(true); setFilters({ ...filters, page: filters.page + 1 }); }}>Next</button></div></nav>}
     </section>
     <Link href="/events?timeframe=all" className="inline-block text-sm font-medium text-[#00629B] hover:underline">Browse all published events →</Link>
+    {deleting && <DeleteEventDialog event={deleting} onClose={() => setDeleting(null)} onDeleted={() => { setDeleting(null); setLoading(true); if (catalogue?.data.length === 1 && filters.page > 1) setFilters({ ...filters, page: filters.page - 1 }); else setReload((current) => current + 1); }} />}
     {(creating || editing) && user && <EventDialog key={editing?.id ?? "create"} existing={editing ?? undefined} chapter={user.chapter} canChooseChapter={canChooseChapter} onClose={() => { setCreating(false); setEditing(null); }} onCreated={() => { setCreating(false); setEditing(null); filterForm.current?.reset(); setLoading(true); setFilters({ page: 1, status: "", search: "" }); }} />}
   </div></AdminShell>;
 }

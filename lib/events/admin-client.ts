@@ -9,7 +9,7 @@ export async function adminEventRequest(query = "", body?: CreateEvent | Record<
   const multipart = body instanceof FormData;
   let response: Response;
   try { response = await protectedFetch(`/api/events${query}`, { method: method ?? (body ? "POST" : "GET"), signal, ...(body ? multipart ? { body } : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {}) }); }
-  catch (error) { if (signal?.aborted) throw error; throw new AdminEventRequestError(body ? "The save could not be confirmed. Check the event list before trying again; your changes are still here." : "Unable to reach the event service."); }
+  catch (error) { if (signal?.aborted) throw error; throw new AdminEventRequestError(method === "DELETE" ? "Deletion could not be confirmed. Refresh the event list before trying again." : body ? "The save could not be confirmed. Check the event list before trying again; your changes are still here." : "Unable to reach the event service."); }
   const result = await response.json().catch(() => null);
   if (!response.ok) {
     const fields: Record<string, string> = {};
@@ -19,6 +19,10 @@ export async function adminEventRequest(query = "", body?: CreateEvent | Record<
     throw new AdminEventRequestError(response.status === 413 ? "The upload is too large for the server. Choose an image of 5 MiB or smaller." : result?.error || result?.message || "Unable to complete the event request.", fields);
   }
   return result;
+}
+export function deleteAdminEvent(id: number) {
+  if (!Number.isSafeInteger(id) || id < 1) throw new AdminEventRequestError("Invalid event ID.");
+  return adminEventRequest(`/${id}`, undefined, undefined, "DELETE");
 }
 export function saveAdminEvent(fields: Record<string, unknown>, image: EventImageSelection, id?: number) {
   if (image.file) return adminEventRequest(id ? `/${id}` : "", eventMultipart(fields, image, Boolean(id)), undefined, "POST");

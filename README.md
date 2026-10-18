@@ -327,3 +327,9 @@ Automated tests include a local HTTP multipart transport check verifying generat
 ## Landing upcoming events
 
 The homepage Upcoming events section loads the next three published upcoming events through the same server-side environment-configured public API helper as /events. It retains the existing dated rows, section heading, dividers, typography and chapter tags. A 96 x 64 cover thumbnail sits between each date and title, hidden below the md breakpoint, using cover_image_url with the shared fallback. A See all events button below the rows always links to /events?timeframe=all. Loading streams inside the section; an API failure shows a local unavailable state while the rest of the homepage remains available. No demo records are substituted for missing backend events.
+
+## Event deletion
+
+Admin Events shows Delete event only for users with DELETE_EVENT. The confirmation dialog identifies the event and requires a separate delete click; cancel receives initial focus. The local DELETE /api/events/{id} route rechecks the permission, validates the ID and origin, and calls DELETE /events/{id} with the server-held bearer token and no request body. Backend chapter restrictions and missing-event errors are preserved.
+
+On success the admin list refreshes with its current filters, moving back a page if its last event was removed. The backend archives and soft-deletes the event, removing it from ordinary admin/public queries while retaining its cover and associated forms/submissions according to the backend contract. Failed requests keep the dialog open; duplicate clicks are blocked and deletion is never automatically retried. Automated deletion tests use mocks and do not remove real backend records.

@@ -7,18 +7,18 @@ import { eventMultipart, validateCoverFile } from "./cover";
 
 export async function handleAdminEvents(request: Request, id?: string) {
   if (id !== undefined && (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id)))) return json({ error: "Invalid event ID." }, 422);
-  if (!["GET", "POST", ...(id ? ["PUT"] : [])].includes(request.method)) return json({ error: "Method not allowed." }, 405);
+  if (!["GET", "POST", ...(id ? ["PUT", "DELETE"] : [])].includes(request.method)) return json({ error: "Method not allowed." }, 405);
   if (request.method !== "GET" && !sameOrigin(request)) return json({ error: "Request origin is not allowed." }, 403);
   const profile = await currentUserResponse();
   if (!profile.ok) return profile;
   const user = await profile.json();
-  const action = id ? "UPDATE_EVENT" : "CREATE_EVENT";
+  const action = request.method === "DELETE" ? "DELETE_EVENT" : id ? "UPDATE_EVENT" : "CREATE_EVENT";
   if (request.method !== "GET" && !hasPermission(user, action)) return json({ error: `You do not have ${action} permission.` }, 403);
   try {
     let data;
     let method = request.method;
     const params: Record<string, string> = {};
-    if (request.method !== "GET") {
+    if (request.method !== "GET" && request.method !== "DELETE") {
       const multipart = request.headers.get("content-type")?.startsWith("multipart/form-data");
       let input: Record<string, unknown>;
       let file: File | null = null;
@@ -71,9 +71,9 @@ export async function handleAdminEvents(request: Request, id?: string) {
     const failure = await response.json().catch(() => null);
     const errors = failure?.errors && typeof failure.errors === "object" ? failure.errors : undefined;
     const message = errors && Object.values(errors).flat().find((value) => typeof value === "string");
-    return json({ error: response.status === 413 ? "The upload exceeds the server limit. Choose an image of 5 MiB or smaller." : response.status === 503 ? "The image could not be stored. Keep your selection and try again." : response.status >= 500 ? "The save could not be confirmed. Check the event list before trying again." : message || failure?.message || failure?.error || "Unable to complete the event request.", ...(errors && response.status === 422 ? { errors } : {}) }, response.status);
+    return json({ error: request.method === "DELETE" && response.status >= 500 ? "Deletion could not be confirmed. Refresh the event list before trying again." : response.status === 413 ? "The upload exceeds the server limit. Choose an image of 5 MiB or smaller." : response.status === 503 ? "The image could not be stored. Keep your selection and try again." : response.status >= 500 ? "The save could not be confirmed. Check the event list before trying again." : message || failure?.message || failure?.error || "Unable to complete the event request.", ...(errors && response.status === 422 ? { errors } : {}) }, response.status);
   } catch (error) {
     if (error instanceof EventValidationError) return json({ error: error.message, errors: Object.fromEntries(Object.entries(error.fields).map(([key, value]) => [key, [value]])) }, 422);
-    return json({ error: "Unable to reach the event service. Please try again." }, 502);
+    return json({ error: request.method === "DELETE" ? "Deletion could not be confirmed. Refresh the event list before trying again." : "Unable to reach the event service. Please try again." }, 502);
   }
 }
