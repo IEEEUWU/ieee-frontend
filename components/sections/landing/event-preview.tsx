@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ArrowLeft, Quotes } from "@phosphor-icons/react/ssr";
 import { type CalendarEvent } from "./data";
+import { EventTimeline } from "./event-timeline";
 import { SectionHeading } from "./heading";
 import { BORDER_BTN2, BORDER_CARD, RULE_BOTTOM, RULE_TOP } from "./styles";
 import { EventCard } from "@/components/sections/event-card";
@@ -201,6 +202,15 @@ export function LandingEventPreview({
           </figcaption>
         </figure>
       </div>
+
+      {/* Event Timeline / Important Dates */}
+      {event.timeline && event.timeline.length > 0 ? (
+        <EventTimeline
+          timeline={event.timeline}
+          brandColour={brand}
+          inkColour={ink}
+        />
+      ) : null}
 
       {/* Collaboration */}
       <div

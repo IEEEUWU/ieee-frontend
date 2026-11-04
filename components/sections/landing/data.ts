@@ -113,6 +113,18 @@ export type EventFeedback = {
 };
 
 /**
+ * Milestone in an event timeline (e.g. Call for Papers, Submissions, Registrations, Event Day).
+ */
+export type EventMilestone = {
+  readonly date: string;
+  readonly title: string;
+  readonly description?: string;
+  readonly highlight?: boolean;
+  readonly badge?: string;
+  readonly status?: "completed" | "active" | "upcoming";
+};
+
+/**
  * The published programme: one entry per event that has a preview page at
  * `/events/[slug]`, addressed by `slug`.
  *
@@ -123,6 +135,109 @@ export type EventFeedback = {
  * `EventRecord`, so a richer row never changes their layout.
  */
 export const EVENTS = [
+  {
+    slug: "impetus-2026",
+    day: "27",
+    month: "MAY",
+    title: "IMPETUS 2026",
+    description:
+      "International Conference on Computing, Engineering, and Technology: Humanity First — Steering Innovation for Ethical Impact.",
+    tag: "IEEE Student Branch",
+    cover: "/photos/events/hack-night.jpg",
+    time: "08:30 – 17:30",
+    venue: {
+      mode: "hybrid",
+      place: "Uva Wellassa University, Badulla, Sri Lanka",
+    },
+    collaboration: {
+      name: "Faculty of Applied Sciences, UWU",
+      kind: "external",
+      description:
+        "Hosted by Uva Wellassa University of Sri Lanka and organized by the Faculty of Applied Sciences in collaboration with the IEEE UWU Student Branch. Inviting research papers from academics, researchers, and undergraduates across diverse disciplines.",
+    },
+    sponsors: [
+      "IEEE Sri Lanka Section",
+      "Faculty of Applied Sciences, UWU",
+      "Uva Wellassa University",
+    ],
+    gallery: [
+      "/photos/events/hack-night.jpg",
+      "/photos/events/vision-code.jpg",
+      "/photos/control-panel.jpg",
+    ],
+    speaker: {
+      name: "Prof. K. W. S. N. Kumari",
+      title: "Conference Coordinator",
+      photo: "/photos/committee-placeholder.jpg",
+      bio: "Professor in Applied Sciences leading research coordination for IMPETUS 2026, fostering an interdisciplinary academic culture and ethical technological innovation.",
+    },
+    feedbacks: [
+      {
+        quote:
+          "IMPETUS provides an essential platform for academics, researchers, and undergraduates across diverse engineering and computing disciplines to present peer-reviewed findings.",
+        name: "Ms. R. P. Abeywardhana",
+        role: "Conference Secretary",
+      },
+      {
+        quote:
+          "A transformative research gathering bridging academic research and real-world ethical technology implementations.",
+        name: "Prof. K. W. S. N. Kumari",
+        role: "Conference Coordinator",
+      },
+    ],
+    timeline: [
+      {
+        date: "FEB 06",
+        title: "Call For Papers Opens",
+        description:
+          "Call for papers announcement and manuscript submission portal opens.",
+        status: "completed",
+      },
+      {
+        date: "APR 02",
+        title: "Full Paper Submission Deadline",
+        description:
+          "Final deadline for submitting full research papers across all conference tracks.",
+        status: "completed",
+      },
+      {
+        date: "MAY 02",
+        title: "Early-Bird Registration Opens & Author Notification",
+        description:
+          "Peer review results released to authors; early-bird registration window opens.",
+        status: "completed",
+      },
+      {
+        date: "MAY 10",
+        title: "Camera-Ready & Early-Bird Deadline",
+        description:
+          "Camera-ready submission deadline and early-bird registration cut-off.",
+        status: "completed",
+      },
+      {
+        date: "MAY 11",
+        title: "Regular Registration Opens",
+        description: "Standard delegate and attendee registration window opens.",
+        status: "active",
+      },
+      {
+        date: "MAY 20",
+        title: "Regular Registration Deadline",
+        description:
+          "Final registration closure for both in-person and virtual participants.",
+        status: "upcoming",
+      },
+      {
+        date: "MAY 27",
+        title: "Conference Date",
+        description:
+          "Keynotes, technical sessions, and paper presentations in hybrid mode.",
+        badge: "Hybrid Mode",
+        highlight: true,
+        status: "upcoming",
+      },
+    ],
+  },
   {
     slug: "uwu-hackathon-2026",
     day: "24",
@@ -171,6 +286,38 @@ export const EVENTS = [
           "Forming a team on the spot turned out to be the best part — we shipped with people we had never met before.",
         name: "Tharindu Bandara",
         role: "Second year, Faculty of Science and Technology",
+      },
+    ],
+    timeline: [
+      {
+        date: "OCT 01",
+        title: "Team Registration Opens",
+        description:
+          "Registration opens for university builder teams across all faculties.",
+        status: "completed",
+      },
+      {
+        date: "OCT 14",
+        title: "Idea Submissions & Mentoring",
+        description:
+          "Initial proposal submission deadline and online mentor office hours.",
+        status: "completed",
+      },
+      {
+        date: "OCT 20",
+        title: "Finalist Shortlist Announced",
+        description:
+          "Top 20 teams shortlisted for the on-site hackathon sprint.",
+        status: "completed",
+      },
+      {
+        date: "OCT 24",
+        title: "24-Hour Build Sprint & Demo Day",
+        description:
+          "Kickoff sprint at Faculty of Applied Sciences, pitching to industry judges.",
+        badge: "In-Person",
+        highlight: true,
+        status: "active",
       },
     ],
   },
@@ -223,6 +370,38 @@ export const EVENTS = [
         role: "Third year, Faculty of Management Studies",
       },
     ],
+    timeline: [
+      {
+        date: "OCT 15",
+        title: "Rulebook & Registration Opens",
+        description:
+          "Official track specs, line dimensions, and registration release.",
+        status: "completed",
+      },
+      {
+        date: "OCT 28",
+        title: "Workshop: Line-Following & Vision",
+        description:
+          "Hands-on clinic on camera, sensor choices, and PID tuning.",
+        status: "completed",
+      },
+      {
+        date: "NOV 04",
+        title: "Track Testing & Calibration",
+        description:
+          "Open track calibration session at the Robotics Laboratory.",
+        status: "completed",
+      },
+      {
+        date: "NOV 08",
+        title: "Final Competition & Race Day",
+        description:
+          "Timed runs, obstacle trials, and championship finals.",
+        badge: "Arena",
+        highlight: true,
+        status: "upcoming",
+      },
+    ],
   },
   {
     slug: "she-leads-in-tech",
@@ -270,6 +449,38 @@ export const EVENTS = [
         role: "Third year, Faculty of Applied Sciences",
       },
     ],
+    timeline: [
+      {
+        date: "NOV 01",
+        title: "Mentee Applications Open",
+        description:
+          "Registration opens for women undergraduates in STEM faculties.",
+        status: "completed",
+      },
+      {
+        date: "NOV 12",
+        title: "Speaker Panel Announced",
+        description:
+          "Lineup of women engineering leaders and topic agendas published.",
+        status: "completed",
+      },
+      {
+        date: "NOV 18",
+        title: "Registration Closes",
+        description:
+          "Seat confirmation and RSVP cutoff for auditorium and livestream.",
+        status: "completed",
+      },
+      {
+        date: "NOV 22",
+        title: "Keynote & Mentoring Evening",
+        description:
+          "Auditorium keynote, roundtable breakout sessions, and career clinic.",
+        badge: "Hybrid",
+        highlight: true,
+        status: "upcoming",
+      },
+    ],
   },
   {
     slug: "industrial-automation-symposium-2026",
@@ -311,6 +522,38 @@ export const EVENTS = [
         role: "Fourth year, Faculty of Technological Studies",
       },
     ],
+    timeline: [
+      {
+        date: "NOV 10",
+        title: "Abstract Submissions Open",
+        description:
+          "Call for industry projects, automation demos, and poster abstracts.",
+        status: "completed",
+      },
+      {
+        date: "NOV 24",
+        title: "Demo Slot Confirmation",
+        description:
+          "Hardware booth and PLC simulator slot allocations confirmed.",
+        status: "completed",
+      },
+      {
+        date: "DEC 01",
+        title: "Delegate Pass Registration Closes",
+        description:
+          "Final registration window for student and faculty participants.",
+        status: "completed",
+      },
+      {
+        date: "DEC 05",
+        title: "Symposium & Factory Control Demos",
+        description:
+          "Technical symposium, smart grid demos, and factory control sessions.",
+        badge: "Full-day",
+        highlight: true,
+        status: "upcoming",
+      },
+    ],
   },
   {
     slug: "ieee-uwu-congress-2026",
@@ -350,6 +593,38 @@ export const EVENTS = [
           "The Congress unites all four chapters under one roof — the best networking day of the year.",
         name: "Tharindu Wickrama",
         role: "Third year volunteer",
+      },
+    ],
+    timeline: [
+      {
+        date: "NOV 20",
+        title: "Delegate Nominations Open",
+        description:
+          "Branch executive committee and chapter volunteer nominations open.",
+        status: "completed",
+      },
+      {
+        date: "DEC 05",
+        title: "General Registration Closes",
+        description:
+          "RSVP deadline for member delegates and distinguished alumni guests.",
+        status: "completed",
+      },
+      {
+        date: "DEC 12",
+        title: "Annual Awards Shortlist Announced",
+        description:
+          "Announcement of shortlisted student volunteers and chapter projects.",
+        status: "completed",
+      },
+      {
+        date: "DEC 19",
+        title: "Annual Congress & Awards Gala",
+        description:
+          "Chapter showcases, keynote addresses, and volunteer recognition gala.",
+        badge: "Main Hall",
+        highlight: true,
+        status: "upcoming",
       },
     ],
   },
@@ -410,6 +685,7 @@ export const PAST_EVENTS = [
  */
 export type CalendarEvent = (typeof EVENTS)[number] & {
   readonly registration?: string;
+  readonly timeline?: readonly EventMilestone[];
 };
 
 export type Member = {
